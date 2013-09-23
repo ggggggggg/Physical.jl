@@ -1,11 +1,8 @@
+include("Units.jl")
 module Quantitys
 using Units
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
-
-macro promote_type(x) # useful for debugging promote_rule issues
-    promote_type(map((y)->typeof(y) == y ? y : typeof(y), eval(x))...)
-end
 
 typealias QValue  Union(Real, Complex{Float64}, ImaginaryUnit)
 

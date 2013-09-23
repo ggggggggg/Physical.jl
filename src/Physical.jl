@@ -1,3 +1,5 @@
+include("Quantitys.jl")
+include("Uncertainty.jl")
 module Physical
 using Quantitys, Uncertainty
 convert{S<:Quantitys.QValue}(::Type{Uncertainty.Uncertain{FloatingPoint}},x::Quantitys.Quantity{S}) = error("dont't convert from Quantity{$S} to Uncertain{$T}")
@@ -44,7 +46,6 @@ const c_light = 299792458*Meter/Second
 const e_electron = 1.60817657e-19*Coulomb
 const a_bohr = 5.2917721092e-11*Meter
 
-println(whos())
 export Meter, Second, KiloGram, Kilogram, Kelvin, Mole, Candela, Newton, Uncertain
 
 end # end module

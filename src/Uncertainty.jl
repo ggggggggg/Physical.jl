@@ -17,20 +17,21 @@ quadsum_neg(x::Number...) = sqrt(sum(sign([x...]).*([x...].^2)))
 +(x::Uncertain, y::Uncertain) = Uncertain_(x.v+y.v, quadsum_neg(x.u,+y.u,covariance(x,y)))
 -(x::Uncertain) = Uncertain(-x.v, x.u)
 -(x::Uncertain, y::Uncertain) = x + -y
-*(x::Uncertain, y::Uncertain) = Uncertain_(x.v*y.v, quadsum_neg(x.u/x.v, y.u/y.v, 2*x.u*y.u*correlation(x,y)/(x.v*y.v)))
-/(x::Uncertain, y::Uncertain) = Uncertain_(x.v/y.v, quadsum_neg(x.u/x.v, y.u/y.v, -2*x.u*y.u*correlation(x,y)/(x.v*y.v)))
-log(x::Uncertain) = Uncertain_(log(x.v), x.u/x.v)
-log(base::Number, x::Uncertain) = Uncertain_(log(base,x.v), x.u/(x.v*log(base)))
+*(x::Uncertain, y::Uncertain) = (v = x.v*y.v; Uncertain_(v, v*quadsum_neg(x.u/x.v, y.u/y.v, 2*x.u*y.u*correlation(x,y)/(x.v*y.v))))
+/(x::Uncertain, y::Uncertain) = (v = x.v/y.v; Uncertain_(v, v*quadsum_neg(x.u/x.v, y.u/y.v, -2*x.u*y.u*correlation(x,y)/(x.v*y.v))))
+log(x::Uncertain) = (v = log(x.v); Uncertain_(v, x.u/x.v))
+log(base::Number, x::Uncertain) = (v = log(base,x.v); Uncertain_(v, x.u/(x.v*log(base))))
 log10(x::Uncertain) = log(10, x)
 ^(x::Uncertain, y::Uncertain) = error("x^y with both ::Uncertain not implemented, don't know formula")
-^(x::Uncertain, y::Integer) = Uncertain_(x.v^convert(FloatingPoint,y), y*x.u/x.v)
-^(x::Uncertain, y::Rational) = Uncertain_(x.v^convert(FloatingPoint,y), y*x.u/x.v)
-^(x::Uncertain, y::Number) = Uncertain_(x.v^y, y*x.u/x.v)
-^{T<:FloatingPoint}(x::MathConst{:e}, y::Uncertain{T}) = convert(T, eval(x))^y
-^{s,T<:FloatingPoint}(x::MathConst{s}, y::Uncertain{T}) = convert(T, eval(x))^y
-^(x::Number, y::Uncertain) = Uncertain_(x^y.v, log(x)*y.u)
-exp(x::Uncertain) = Uncertain_(exp(x.v), x.u)
-^{T<:Number}(::MathConst{:e},x::Uncertain{T}) = exp(x)
+^(x::Uncertain, y::Integer) = (v = x.v^convert(FloatingPoint,y); Uncertain_(v, v*y*x.u/x.v))
+^(x::Uncertain, y::Rational) = (v = x.v^convert(FloatingPoint,y); Uncertain_(v, v*y*x.u/x.v))
+^(x::Uncertain, y::Number) = (v = x.v^y; Uncertain_(v, v*y*x.u/x.v))
+^{T<:FloatingPoint}(x::MathConst{:e}, y::Uncertain{T}) = exp(y)
+^{s,T<:FloatingPoint}(x::MathConst{s}, y::Uncertain{T}) = convert(T, eval(s))^y
+^(x::Number, y::Uncertain) = (v = x.v^y; Uncertain_(v, v*log(x)*y.u))
+exp(x::Uncertain) = (v = exp(x.v); Uncertain_(v, v*x.u))
+^{T<:Number}(x::MathConst{:e},y::Uncertain{T}) = exp(y)
+==(x::Uncertain, y::Uncertain) = isapprox(x.v,y.v) && isapprox(x.u,y.u)
 
 promote_rule{S<:FloatingPoint}(::Type{Bool}, ::Type{Uncertain{S}}) = Uncertain{S}
 promote_rule{T<:Complex, S<:FloatingPoint}(::Type{T}, ::Type{Uncertain{S}}) = Uncertain{S}

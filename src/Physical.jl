@@ -3,43 +3,86 @@ import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
 macro promote_type(x) # useful for debugging promote_rule issues
     promote_type(map((y)->typeof(y) == y ? y : typeof(y), eval(x))...)
 end
-
+type Unit <: Number
+        d::Dict{UTF8String, Float64}
+end
+defaultget(x::Dict, key::String) = haskey(x, key) ? x[key] : float64(0)
+Unit() = Unit(Dict{UTF8String, Float64}())
+function Unit(x::String)
+    z = Unit()
+    z.d[convert(UTF8String, x)] = 1.0
+    return z
+end
+function *(x::Unit, y::Unit)
+    z = Unit()
+    combined_units = union(keys(x.d), keys(y.d))
+    for u in combined_units
+        newpower = float64(float32(defaultget(x.d,u)+defaultget(y.d,u)))
+        if newpower != 0.0
+                z.d[u] = newpower
+        end
+    end
+    return z
+end
+function ^(x::Unit,y::Integer)
+    y == 0 ? (return x) : 0
+    z = Unit()
+    for (k,v) in x.d
+            z.d[k] = v*y
+    end
+    return z
+end
+function ^(x::Unit,y::Rational)
+    y == 0 ? (return x) : 0
+    z = Unit()
+    for (k,v) in x.d
+            z.d[k] = v*y
+    end
+    return z
+end
+function ^(x::Unit,y::Number)
+    y == 0 ? (return x) : 0
+    z = Unit()
+    for (k,v) in x.d
+            z.d[k] = v*y
+    end
+    return z
+end
 
 typealias QValue  Union(Real, Complex{Float64}, ImaginaryUnit)
-immutable Unit <: Number
-    powers::Array{Float64}
-end
+
 immutable Quantity{T<:QValue} <: Number
     value::T
     unit::Unit
 end
-type SIArray{T<:QValue, N} <: AbstractArray
+Quantity_(x::Number, y::Unit) = y == Unitless ? x : Quantity(x,y)
+Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
+
+type QArray{T<:QValue, N} <: AbstractArray
     value::Array{T, N}
     unit::Unit
 end
-typealias SIType Union(Unit, Quantity, SIArray)
-SIArray(x::QValue, unit::Unit) = Quantity(x, unit) # enables a[1] to return a Quantity
+QArray_(x::Array, y::Unit) = y == Unitless ? x : QArray(x,y)
+typealias SIType Union(Unit, Quantity, QArray)
+QArray_(x::QValue, unit::Unit) = Quantity_(x, unit) # enables a[1] to return a Quantity
 
 
+-(x::Unit) = x^-1.0
+/(x::Unit, y::Unit) = *(x,y^-1.0)
+==(x::Unit, y::Unit) = x.d==y.d
 +(x::Unit, y::Unit) = error("cannot add Units")
 -(x::Unit, y::Unit) = error("cannot subtract Units")
-*(x::Unit, y::Unit) = Unit(x.powers+y.powers)
-*(x::Unit, y::QValue) = Quantity(y, Unitless)*x
+*(x::Unit, y::QValue) = Quantity_(y, x)
 *(x::QValue, y::Unit) = *(y,x)
-/(x::Unit, y::Unit) = Unit(x.powers-y.powers)
-^(x::Unit, y::Integer) = Unit(x.powers*(y==0 ? 1: y)) # I get errors about ambiguity if I don't define this for n::Integer
-^(x::Unit, y::Rational) = Unit(x.powers*(y==0 ? 1: y))
-^(x::Unit, y::QValue) = Unit(x.powers*(y==0 ? 1: y))
-==(x::Unit, y::Unit) = x.powers == y.powers
 
-*{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity(x.value*y.value, x.unit*y.unit)
-/{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity(x.value/y.value, x.unit/y.unit)
-+{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
--{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity(x.value-y.value, x.unit) : error("x=$x cannot subtract with y=$y because units are not equal")
--{T}(x::Quantity{T}) = Quantity(-x.value, x.unit)
-^{T}(x::Quantity{T}, y::Integer) = Quantity(x.value^n, x.unit^y)
-^{T}(x::Quantity{T}, y::Rational) = Quantity(x.value^n, x.unit^y)
-^{T}(x::Quantity{T}, y::QValue) = Quantity(x.value^n, x.unit^y) # I get errors about ambiguity if I don't define this for n::Integer
+*{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
+/{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value/y.value, x.unit/y.unit)
++{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
+-{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value-y.value, x.unit) : error("x=$x cannot subtract with y=$y because units are not equal")
+-{T}(x::Quantity{T}) = Quantity_(-x.value, x.unit)
+^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^n, x.unit^y)
+^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^n, x.unit^y)
+^{T}(x::Quantity{T}, y::QValue) = Quantity_(x.value^n, x.unit^y) # I get errors about ambiguity if I don't define this for n::Integer
 sqrt(x::Quantity) = x^(1/2)
 
 
@@ -55,57 +98,25 @@ promote_rule{S<:QValue}(::Type{Unit}, ::Type{Quantity{S}}) = Quantity{S}
 promote_rule{T<:QValue,S<:QValue}(::Type{T}, ::Type{Quantity{S}}) = Quantity{promote_type(T,S)}
 promote_rule{T<:QValue,S<:QValue}(::Type{Quantity{T}}, ::Type{Quantity{S}}) = Quantity{promote_type(T,S)}
 
-# SIArray
-+(x::SIArray, y::SIArray) = x.unit == y.unit ? SIArray(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
--(x::SIArray, y::SIArray) = x.unit == y.unit ? SIArray(x.value-y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
--(x::SIArray) = SIArray(-x.value, x.unit)
-*(x::SIArray, y::SIArray) = SIArray(x.value*y.value, x.unit*y.unit)
-.*(x::SIArray, y::SIArray) = SIArray(x.value.*y.value, x.unit*y.unit)
-/(x::SIArray, y::SIArray) = SIArray(x.value/y.value, x.unit/y.unit)
-./(x::SIArray, y::SIArray) = SIArray(x.value./y.value, x.unit/y.unit)
-^(x::SIArray, y::Integer) = SIArray(x.value^y, x.unit^y)
-^(x::SIArray, y::QValue) = SIArray(x.value^y, x.unit^y)
-.^(x::SIArray, y::QValue) = SIArray(x.value.^y, x.unit^y)
-Base.getindex(x::SIArray, y...) = SIArray(getindex(x.value, y...),x.unit)
-Base.setindex!(x::SIArray, y, z...) = setindex!(x.value, y, z...)
-Base.size(x::SIArray) = size(x.value)
-Base.ndims(x::SIArray) = ndims(x.value)
-Base.endof(x::SIArray) = endof(x.value)
-Base.length(x::SIArray) = length(x.value)
+# QArray
++(x::QArray, y::QArray) = x.unit == y.unit ? QArray_(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
+-(x::QArray, y::QArray) = x.unit == y.unit ? QArray_(x.value-y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
+-(x::QArray) = QArray(-x.value, x.unit)
+*(x::QArray, y::QArray) = QArray_(x.value*y.value, x.unit*y.unit)
+.*(x::QArray, y::QArray) = QArray_(x.value.*y.value, x.unit*y.unit)
+/(x::QArray, y::QArray) = QArray_(x.value/y.value, x.unit/y.unit)
+./(x::QArray, y::QArray) = QArray_(x.value./y.value, x.unit/y.unit)
+^(x::QArray, y::Integer) = QArray_(x.value^y, x.unit^y)
+^(x::QArray, y::QValue) = QArray_(x.value^y, x.unit^y)
+.^(x::QArray, y::QValue) = QArray_(x.value.^y, x.unit^y)
+Base.getindex(x::QArray, y...) = QArray_(getindex(x.value, y...),x.unit)
+Base.setindex!(x::QArray, y, z...) = setindex!(x.value, y, z...)
+Base.size(x::QArray) = size(x.value)
+Base.ndims(x::QArray) = ndims(x.value)
+Base.endof(x::QArray) = endof(x.value)
+Base.length(x::QArray) = length(x.value)
 
-convert{T,N,S,N2}(::Type{SIArray{T,N}}, x::Array{S,N2}) = SIArray(convert(promote_type(Array{promote_type(T,S),N}),x), Unitless)
-
-Base.sin(x::SIType) = x.unit == Unitless ? SIArray(sin(x.value), Unitless) : error("sin(x) require unitless argument")
-
-
-const UnitSymbols = ["m", "kg", "s", "A", "K", "mol", "cd"]
-const Meter    = Unit(float64([1,0,0,0,0,0,0]))
-const KiloGram = Unit(float64([0,1,0,0,0,0,0]))
-const Second   = Unit(float64([0,0,1,0,0,0,0]))
-const Ampere   = Unit(float64([0,0,0,1,0,0,0]))
-const Kelvin   = Unit(float64([0,0,0,0,1,0,0]))
-const Mole     = Unit(float64([0,0,0,0,0,1,0]))
-const Candela  = Unit(float64([0,0,0,0,0,0,1]))
-const Unitless = Unit(float64([0,0,0,0,0,0,0]))
-const Gram       = (1//1000)KiloGram
-const CentiMeter = (1//100)Meter
-
-const Joule      = KiloGram*Meter^2/Second^2
-const Newton     = KiloGram*Meter/Second^2
-
-aJoule = Quantity(1, Joule)
-aMeter = Quantity(1, Meter)
-
-GramMeter = Gram*Meter
-ComplexForce = (1+2.0*im)*Newton
-
-a = SIArray([1,2,3,4],Meter)
-b = SIArray([1 2 3 4], Newton)
-a+a
-a.*a
-a*b
-a.^2
-sin(aMeter/Meter)
+convert{T,N,S,N2}(::Type{QArray{T,N}}, x::Array{S,N2}) = QArray(convert(promote_type(Array{promote_type(T,S),N}),x), Unitless)
 
 # printing Text
 superscript(i) = map(repr(i)) do c
@@ -123,16 +134,15 @@ superscript(i) = map(repr(i)) do c
     c   ==  '.' ? '\u00b7' :
     error("Unexpected Chatacter")
 end
-
 function show(io::IO,x::Unit)
-    if x.powers == float64([0,0,0,0,0,0,0])
+    if isempty(x.d)
         print(io, "Unitless")
     end
-    for i in 1:length(UnitSymbols)
-        if x.powers[i] == 1
-            print(io, UnitSymbols[i]*"\u200a")
-        elseif x.powers[i] != 0
-            print(io, UnitSymbols[i]*superscript(x.powers[i]))
+    for (k,v) in x.d
+        if v == 1
+            print(io, k*"\u200a")
+        elseif v != 0
+            print(io, k*superscript(v))
         end
     end
 end
@@ -141,9 +151,40 @@ function show{T}(io::IO, x::Quantity{T})
     print(io, " ")
     show(io, x.unit)
 end
-function show(io::IO, x::SIArray)
+function show(io::IO, x::QArray)
     show(io, x.value)
     print(io, " ")
     show(io, x.unit)
 end
+
+# actual units
+const Unitless = Unit()
+const Meter = Unit("m")
+const Second = Unit("s")
+const KiloGram = Unit("kg")
+const Mole = Unit("mol")
+const Candela = Unit("cd")
+const Radian = Unit("rad")
+const Ampere = Unit("A")
+
+const Newton = KiloGram*Meter/Second^2
+const Joule = Newton*Meter
+const Coulomb = Ampere*Second
+
+Gram = 1//1000*KiloGram
+
+aJoule = 1*Joule
+aMeter = 1*Meter
+
+#GramMeter = Gram*Meter
+ComplexForce = (1+2.0*im)*Newton
+
+a = [1,2,3,4]*Meter
+b = [1 2 3 4]*Newton
+a+a
+a.*a
+a*b
+a.^2
+
+
 

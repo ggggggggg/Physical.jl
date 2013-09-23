@@ -1,4 +1,5 @@
 module Units
+import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
 
 type Unit
         d::Dict{UTF8String, Float64}

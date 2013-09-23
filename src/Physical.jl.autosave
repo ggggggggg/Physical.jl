@@ -44,7 +44,6 @@ const c_light = 299792458*Meter/Second
 const e_electron = 1.60817657e-19*Coulomb
 const a_bohr = 5.2917721092e-11*Meter
 
-println(whos())
 export Meter, Second, KiloGram, Kilogram, Kelvin, Mole, Candela, Newton, Uncertain
 
 end # end module

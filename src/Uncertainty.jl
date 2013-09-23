@@ -1,4 +1,4 @@
-module UncertainNumber
+module Uncertainty
 
 # adding methods to
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, log, log10, exp

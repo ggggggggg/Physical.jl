@@ -178,11 +178,14 @@ const Unitless = Unit()
 const Meter = Quantity(1,Unit("m"))
 const Second = Quantity(1, Unit("s"))
 const KiloGram = Quantity(1, Unit("kg"))
+const Kilogram = KiloGram
+const Kelvin = Quantity(1, Unit("K"))
 const Mole = Quantity(1, Unit("mol"))
 const Candela = Quantity(1, Unit("cd"))
 const Radian = Quantity(1, Unit("rad"))
 const Ampere = Quantity(1, Unit("A"))
 const Photon = Quantity(1, Unit("\u0194"))
+const Entities = Quantitiy(1, Unit("entity"))
 
 const Newton = KiloGram*Meter/Second^2
 const Joule = Newton*Meter
@@ -190,6 +193,30 @@ const Coulomb = Ampere*Second
 const Volt = Joule/Coulomb
 const Ohm = Volt/Ampere
 const Hertz = 1/Second
+const Steradian = Radian^2
+const Pascal = Newton/Meter^2
+const Watt = Joule/Second
+const Farad = Coulomb/Volt
+const Siemen = Ohm^-1
+const Weber = Joule/Ampere
+const Tesla = Newton/(Ampere*Meter)
+const Henry = Weber/Ampere
+const Lumen = Candela/Steradian
+const Lux = Lumen/Meter^2
+const Becquerel = Photon/Second
+const Katal = Mole/Second
+
+const k_boltzman = 1.3806488e23 Joule/Kelvin
+const N_avagadro = 6.02214129e23 Entity/Mole
+const h_plank = 6.62606957e-34 Joule*Second
+const hbar_plank = 2*pi*h
+const G_gravity = 6.67384e-11 Meter^3*KiloGram^-1*Second^-2
+const g_gravity = 9.80665 Meter/Second^2
+const c_light = 299792458 Meter/Second
+const e_electron = 1.60817657e-19 Coulomb
+const a_bohr = 5.2917721092e-11 Meter
+
+
 
 
 Gram = 1//1000*KiloGram

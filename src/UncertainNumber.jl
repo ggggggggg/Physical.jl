@@ -1,3 +1,6 @@
+module UncertainNumber
+
+# adding methods to
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, log, log10, exp
 
 type Uncertain{T<:FloatingPoint} <: FloatingPoint
@@ -58,12 +61,5 @@ function show(io::IO, x::Uncertain)
     show(io, x.u)
 end
 
-a = Uncertain(1.0,0.1)
-b = Uncertain(2.0, 0.05)
-x = Uncertain(5.7, 1)
-y = Uncertain(0.1, 0.1)
-x*y
-a*b+x+b
-b^2
-a*b^-2
-x/b
+export Uncertain
+end

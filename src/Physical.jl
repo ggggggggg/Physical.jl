@@ -182,10 +182,15 @@ const Mole = Quantity(1, Unit("mol"))
 const Candela = Quantity(1, Unit("cd"))
 const Radian = Quantity(1, Unit("rad"))
 const Ampere = Quantity(1, Unit("A"))
+const Photon = Quantity(1, Unit("\u0194"))
 
 const Newton = KiloGram*Meter/Second^2
 const Joule = Newton*Meter
 const Coulomb = Ampere*Second
+const Volt = Joule/Coulomb
+const Ohm = Volt/Ampere
+const Hertz = 1/Second
+
 
 Gram = 1//1000*KiloGram
 

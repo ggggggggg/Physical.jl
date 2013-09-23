@@ -63,9 +63,9 @@ type QArray{T<:QValue, N} <: AbstractArray
     unit::Unit
 end
 QArray_(x::Array, y::Unit) = y == Unitless ? x : QArray(x,y)
-typealias SIType Union(Unit, Quantity, QArray)
 QArray_(x::QValue, unit::Unit) = Quantity_(x, unit) # enables a[1] to return a Quantity
-
+QArray(x::QArray, unit::Unit) = error("QArray{QArray} not allowed")
+typealias QType Union(Unit, Quantity, QArray)
 
 -(x::Unit) = x^-1.0
 /(x::Unit, y::Unit) = *(x,y^-1.0)
@@ -80,9 +80,9 @@ QArray_(x::QValue, unit::Unit) = Quantity_(x, unit) # enables a[1] to return a Q
 +{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
 -{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value-y.value, x.unit) : error("x=$x cannot subtract with y=$y because units are not equal")
 -{T}(x::Quantity{T}) = Quantity_(-x.value, x.unit)
-^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^n, x.unit^y)
-^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^n, x.unit^y)
-^{T}(x::Quantity{T}, y::QValue) = Quantity_(x.value^n, x.unit^y) # I get errors about ambiguity if I don't define this for n::Integer
+^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^y, x.unit^y)
+^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^y, x.unit^y)
+^{T}(x::Quantity{T}, y::QValue) = Quantity_(x.value^y, x.unit^y) # I get errors about ambiguity if I don't define this for n::Integer
 sqrt(x::Quantity) = x^(1/2)
 
 
@@ -103,9 +103,19 @@ promote_rule{T<:QValue,S<:QValue}(::Type{Quantity{T}}, ::Type{Quantity{S}}) = Qu
 -(x::QArray, y::QArray) = x.unit == y.unit ? QArray_(x.value-y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
 -(x::QArray) = QArray(-x.value, x.unit)
 *(x::QArray, y::QArray) = QArray_(x.value*y.value, x.unit*y.unit)
-.*(x::QArray, y::QArray) = QArray_(x.value.*y.value, x.unit*y.unit)
-/(x::QArray, y::QArray) = QArray_(x.value/y.value, x.unit/y.unit)
+*(x::QArray, y::Number) = QArray_(x.value*y, x.unit)
+*(x::Number, y::QArray) = y*x
+*(x::Array, y::Unit) = QArray_(x, y)
+*(x::Array, y::QType) = QArray_(x*y.value, y.unit)
+*(x::QType, y::Array) = y*x
+/(x::QType, y::QType) = QArray_(x.value/y.value, x.unit/y.unit)
+/(x::QType, y::Array) = QArray_(x.value/y, x.unit)
+/(x::Array, y::QType) = QArray_(y.value/x, y.unit)
+/(x::Unit, y::Union(QArray, Array)) = QArray_(y.value, x/y.unit)
+/(x::Union(QArray, Array), y::Unit) = QArray_(x.value, y.unit/y)
 ./(x::QArray, y::QArray) = QArray_(x.value./y.value, x.unit/y.unit)
+./(x::QArray, y::Array) = QArray_(x.value/y, x.unit)
+./(x::Array, y::QArray) = QArray_(x/y.value, y.unit)
 ^(x::QArray, y::Integer) = QArray_(x.value^y, x.unit^y)
 ^(x::QArray, y::QValue) = QArray_(x.value^y, x.unit^y)
 .^(x::QArray, y::QValue) = QArray_(x.value.^y, x.unit^y)
@@ -117,6 +127,12 @@ Base.endof(x::QArray) = endof(x.value)
 Base.length(x::QArray) = length(x.value)
 
 convert{T,N,S,N2}(::Type{QArray{T,N}}, x::Array{S,N2}) = QArray(convert(promote_type(Array{promote_type(T,S),N}),x), Unitless)
+
+#promote_rule{T,N,S}(::Type{Array{T,N}}, ::Type{Quantity{S}}) = QArray{promote_rule{T,S},N}
+#promote_rule(::Type{AbstractArray}, ::Type{Unit}) = QArray
+#promote_rule{T,N,S}(::Type{QArray{T,N}}, ::Type{Quantity{S}}) = QArray{promote_rule{T,S},N}
+#promote_rule(::Type{QArray}, ::Type{Unit}) = QArray{T,N}
+#promote_rule(::Type{QArray}, ::Type{Number}) = QArray{T,N}
 
 # printing Text
 superscript(i) = map(repr(i)) do c
@@ -159,13 +175,13 @@ end
 
 # actual units
 const Unitless = Unit()
-const Meter = Unit("m")
-const Second = Unit("s")
-const KiloGram = Unit("kg")
-const Mole = Unit("mol")
-const Candela = Unit("cd")
-const Radian = Unit("rad")
-const Ampere = Unit("A")
+const Meter = Quantity(1,Unit("m"))
+const Second = Quantity(1, Unit("s"))
+const KiloGram = Quantity(1, Unit("kg"))
+const Mole = Quantity(1, Unit("mol"))
+const Candela = Quantity(1, Unit("cd"))
+const Radian = Quantity(1, Unit("rad"))
+const Ampere = Quantity(1, Unit("A"))
 
 const Newton = KiloGram*Meter/Second^2
 const Joule = Newton*Meter
@@ -179,11 +195,11 @@ aMeter = 1*Meter
 #GramMeter = Gram*Meter
 ComplexForce = (1+2.0*im)*Newton
 
-a = [1,2,3,4]*Meter
+a = [1,2,3,4]*Meter # becomes array of quantities, not QArray
 b = [1 2 3 4]*Newton
-a+a
-a.*a
-a*b
+#a+a
+#a.*a
+#a*b
 a.^2
 
 

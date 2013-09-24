@@ -6,7 +6,6 @@ import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, g
 
 typealias QValue  Union(Number, AbstractArray)
 abstract HasUnits
-
 type Quantity{T<:QValue} <: HasUnits
     value::T
     unit::Unit
@@ -14,6 +13,30 @@ end
 Quantity_(x::QValue, y::Unit) = y == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 QUnit(x::String) = Quantity(1,Unit(x))
+
+default_unit_system = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+function QUnit(x::String, y::Quantity, system=default_unit_system)
+    x=convert(UTF8String, x)
+    system[x] = y
+    return QUnit(x)
+end
+function asbase(x::Quantity, system=default_unit_system)
+    out=x.value
+    for (symbol,n) in x.unit.d
+        if haskey(system,symbol)
+            out *= asbase(system[symbol], system)^n
+        else # if it doesn't have they key, then symbol is a base unit
+            out *= QUnit(symbol)^n
+        end
+    end
+    return out
+end
+function as(from::Quantity, to::Quantity, system=default_unit_system) # warning, ignores the value of to, only looks at the units
+    out = Quantity(1, to.unit)
+    f,t = asbase(from, system), asbase(to, system)
+    f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
+    return out
+end
 
 *{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
 *(x::Quantity, y::QValue) = Quantity_(x.value*y, x.unit)
@@ -55,7 +78,7 @@ function show{T}(io::IO, x::Quantity{T})
     show(io, x.unit)
 end
 
-export QUnit
+export QUnit, asbase, as
 
 end #end module
 

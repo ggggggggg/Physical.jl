@@ -25,7 +25,6 @@ function *(x::Unit, y::Unit)
     return z
 end
 function ^(x::Unit,y::Integer)
-    y == 0 ? (return x) : 0
     z = Unit()
     for (k,v) in x.d
             z.d[k] = v*y
@@ -33,7 +32,6 @@ function ^(x::Unit,y::Integer)
     return z
 end
 function ^(x::Unit,y::Rational)
-    y == 0 ? (return x) : 0
     z = Unit()
     for (k,v) in x.d
             z.d[k] = v*y
@@ -41,7 +39,6 @@ function ^(x::Unit,y::Rational)
     return z
 end
 function ^(x::Unit,y::Number)
-    y == 0 ? (return x) : 0
     z = Unit()
     for (k,v) in x.d
             z.d[k] = v*y
@@ -71,6 +68,7 @@ superscript(i) = map(repr(i)) do c
     c   ==  '.' ? '\u00b7' :
     error("Unexpected Chatacter")
 end
+prettyround(x::Float64) = x%1 == 0 ? int64(round(x)) : x
 function show(io::IO,x::Unit)
     if isempty(x.d)
         print(io, "Unitless")
@@ -79,7 +77,7 @@ function show(io::IO,x::Unit)
         if v == 1
             print(io, k*"\u200a")
         elseif v != 0
-            print(io, k*superscript(v))
+            print(io, k*superscript(prettyround(v)))
         end
     end
 end

@@ -15,24 +15,24 @@ const Ampere = QUnit("A")
 const Photon = QUnit("\u0194")
 const Entity = QUnit("entity")
 
-const Newton = KiloGram*Meter/Second^2
-const Joule = Newton*Meter
-const Coulomb = Ampere*Second
-const Volt = Joule/Coulomb
-const Ohm = Volt/Ampere
-const Hertz = 1/Second
-const Steradian = Radian^2
-const Pascal = Newton/Meter^2
-const Watt = Joule/Second
-const Farad = Coulomb/Volt
-const Siemen = Ohm^-1
-const Weber = Joule/Ampere
-const Tesla = Newton/(Ampere*Meter)
-const Henry = Weber/Ampere
-const Lumen = Candela/Steradian
-const Lux = Lumen/Meter^2
-const Becquerel = Photon/Second
-const Katal = Mole/Second
+const Newton = QUnit("N",KiloGram*Meter/Second^2)
+const Joule = QUnit("J", Newton*Meter)
+const Coulomb = QUnit("C", Ampere*Second)
+const Volt = QUnit("V", Joule/Coulomb)
+const Ohm = QUnit("\u03a9", Volt/Ampere)
+const Hertz = QUnit("Hz", 1/Second)
+const Steradian = QUnit("sr", Radian^2)
+const Pascal = QUnit("Pa", Newton/Meter^2)
+const Watt = QUnit("W",Joule/Second)
+const Farad = QUnit("F",Coulomb/Volt)
+const Siemen = QUnit("S", Ohm^-1)
+const Weber = QUnit("Wb", Joule/Ampere)
+const Tesla = QUnit("T", Newton/(Ampere*Meter))
+const Henry = QUnit("H", Weber/Ampere)
+const Lumen = QUnit("lm", Candela/Steradian)
+const Lux = QUnit("lx", Lumen/Meter^2)
+const Becquerel = QUnit("Bq",Photon/Second)
+const Katal = QUnit("kat",Mole/Second)
 
 const k_boltzman = 1.3806488e23*Joule/Kelvin
 const N_avagadro = 6.02214129e23*Entity/Mole
@@ -44,6 +44,9 @@ const c_light = 299792458*Meter/Second
 const e_electron = 1.60817657e-19*Coulomb
 const a_bohr = 5.2917721092e-11*Meter
 
-export Meter, Second, KiloGram, Kilogram, Kelvin, Mole, Candela, Newton, Uncertain
+
+
+export as, asbase, QUnit
+export Meter, Second, KiloGram, Kilogram, Kelvin, Mole, Candela, Newton, Joule, Coulomb, Ohm
 
 end # end module

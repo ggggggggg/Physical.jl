@@ -14,6 +14,16 @@ b = Uncertain(4.1,0.3)
 @assert a^b.v == Uncertain(42.81086821817254,28.083929551121184)
 @assert exp(b) == e^b
 @assert 1.0/b == Uncertain(0.24390243902439027, 0.017846519928613924)
-#@assert a^-1.0 == Uncertain(0.4,-0.064) # negative uncertainy makes no sense, I don't belive this
+@assert a^-1.0 == Uncertain(0.4,0.064)
+@assert 1*b == b
 
+
+# BigFloat
+c = Uncertain(BigFloat(1), sqrt(BigFloat(2)))
+d = Uncertain(BigFloat(2), sqrt(BigFloat(0.1)))
+f = (c+c)/2-c
+
+@assert f.v == 0
+f^-1;
+1^d;
 

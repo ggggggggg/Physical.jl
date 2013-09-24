@@ -2,8 +2,6 @@ include("Quantitys.jl")
 include("Uncertainty.jl")
 module Physical
 using Quantitys, Uncertainty
-convert{S<:Quantitys.QValue}(::Type{Uncertainty.Uncertain{FloatingPoint}},x::Quantitys.Quantity{S}) = error("dont't convert from Quantity{$S} to Uncertain{$T}")
-
 
 const Meter = QUnit("m")
 const Second = QUnit("s")

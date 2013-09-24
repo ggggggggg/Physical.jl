@@ -19,7 +19,7 @@ julia> theta = pi/2*Radian
 1.5707963267948966 rad 
 julia> sin(theta/Radian)
 1.0
-julia> sin(l/Radian)
+julia> sin(1*Meter/Radian)
 ERROR: no method sin(Quantity{Float64},)
 ```
 This works because any operation that leads to a unitless number, just returns a standard Julia datatype.

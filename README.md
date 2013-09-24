@@ -55,4 +55,4 @@ julia> asbase(KiloGram)
 0.0685217659 slug 
 ```
 
-Planned features: Fancy LaTex printing, a function that guesses a nice ways to simplifiy the units. I will definitly include the most accurate fundamental units from CODATA. 
+Planned features: LaTex printing in iJulia, a function that guesses a nice ways to simplifiy the units. I will definitly include the most accurate fundamental units from CODATA. 

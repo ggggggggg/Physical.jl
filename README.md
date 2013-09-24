@@ -1,4 +1,4 @@
-```Physical``` provides simple support for units, as well a nice set of predefined units and constants. So lets start with an example
+```Physical``` provides simple support for units in Julia, as well a nice set of predefined units and constants. So lets start with an example
 
 ```
 julia> using Physical

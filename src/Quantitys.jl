@@ -10,11 +10,11 @@ type Quantity{T<:QValue} <: HasUnits
     value::T
     unit::Unit
 end
-Quantity_(x::QValue, y::Unit) = y == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
+Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
-QUnit(x::String) = Quantity(1,Unit(x))
 
 default_unit_system = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+QUnit(x::String) = Quantity(1,Unit(x))
 function QUnit(x::String, y::Quantity, system=default_unit_system)
     x=convert(UTF8String, x)
     system[x] = y
@@ -31,12 +31,24 @@ function asbase(x::Quantity, system=default_unit_system)
     end
     return out
 end
+function asbase(x::Unit, system=default_unit_system)
+    out=Unitless
+    for (symbol,n) in x.d
+        if haskey(system,symbol)
+            out *= asbase(system[symbol].unit, system)^n
+        else # if it doesn't have they key, then symbol is a base unit
+            out *= Unit(symbol)^n
+        end
+    end
+    return out
+end
 function as(from::Quantity, to::Quantity, system=default_unit_system) # warning, ignores the value of to, only looks at the units
     out = Quantity(1, to.unit)
     f,t = asbase(from, system), asbase(to, system)
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
     return out
 end
+
 
 *{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
 *(x::Quantity, y::QValue) = Quantity_(x.value*y, x.unit)

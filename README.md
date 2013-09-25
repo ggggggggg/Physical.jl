@@ -45,7 +45,7 @@ julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argum
 16.269815397312 m N 
 ```
 
-```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit.  I'm going to use this to switch my base mass unit to the slug.
+```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit. Both of these will overwrite existing units. I'm going to use this to switch my base mass unit to the slug.
 ```
 julia> Slug = QUnit("slug")
 1 slug 

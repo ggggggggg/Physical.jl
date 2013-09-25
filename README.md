@@ -70,3 +70,5 @@ julia> (a*b*Meter)^2
 1.0e6 ± 1.0001999800039988e6 m²
 ```
 Planned features: LaTex printing in iJulia, a function that guesses a nice ways to simplifiy the units. Maximally accurate fundamental units from CODATA. Round properly when displaying Uncertain numbers.
+
+Feel free to start issue if you have any problems or questions or just want to get in contact with me.

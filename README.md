@@ -1,4 +1,4 @@
-```Physical``` provides simple support for units in Julia, as well a nice set of predefined units and constants. The keys are the types `Quantity` and `Unit`, but mostly you should just multiply by predefined unit constants.
+```Physical``` provides simple support for units in Julia, as well a nice set of predefined units and constants. The keys are the types `Quantity` and `Unit`, but you should just use predefined unit constants for the most part.
 
 ```
 julia> using Physical

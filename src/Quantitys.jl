@@ -4,6 +4,9 @@ using Units
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox
 
+
+
+
 typealias QValue  Union(Number, AbstractArray)
 abstract HasUnits
 type Quantity{T<:QValue} <: HasUnits
@@ -13,19 +16,20 @@ end
 Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 
-default_unit_system = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
-function QUnit(x::String, system=default_unit_system)
-    delete!(system, x) # remove from unit system to mark as base unit
+UnitSystem = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+function QUnit(x::String, system=UnitSystem)
+    haskey(system,x) ? delete!(system, x) : 0 # remove from unit system to mark as base unit
     return Quantity(1,Unit(x))
 end
-function QUnit(x::String, y::Quantity, system=default_unit_system)
+function QUnit(x::String, y::Quantity, system=UnitSystem)
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))
 end
-function asbase(x::Quantity, system=default_unit_system)
-    out=x.value
-    for (symbol,n) in x.unit.d
+function asbase(x::Quantity, system=UnitSystem)
+    y = remove_prefix(x)
+    out=y.value
+    for (symbol,n) in y.unit.d
         if haskey(system,symbol)
             out *= asbase(system[symbol], system)^n
         else # if it doesn't have they key, then symbol is a base unit
@@ -34,7 +38,7 @@ function asbase(x::Quantity, system=default_unit_system)
     end
     return out
 end
-function asbase(x::Unit, system=default_unit_system)
+function asbase(x::Unit, system=UnitSystem)
     out=Unitless
     for (symbol,n) in x.d
         if haskey(system,symbol)
@@ -45,7 +49,7 @@ function asbase(x::Unit, system=default_unit_system)
     end
     return out
 end
-function as(from::Quantity, to::Quantity, system=default_unit_system) # warning, ignores the value of to, only looks at the units
+function as(from::Quantity, to::Quantity, system=UnitSystem) # warning, ignores the value of to, only looks at the units
     out = Quantity(1, to.unit)
     f,t = asbase(from, system), asbase(out, system)
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
@@ -97,7 +101,48 @@ function show{T}(io::IO, x::Quantity{T})
     show(io, x.unit)
 end
 
-export QUnit, asbase, as
+type Prefix
+    symbol::UTF8String
+end
+PrefixSystem = Dict{UTF8String, Int16}()
+function NewPrefix(symbol::String, power::Int)
+    PrefixSystem[symbol] = int16(power)
+    return Prefix(convert(UTF8String, symbol))
+end
+function remove_prefix(x::UTF8String)
+    for i = 1:length(x)-1
+        symbol = x[1:i]
+        if haskey(PrefixSystem, symbol)
+            power, prefixless = PrefixSystem[symbol], Unit(x[i+1:end])
+            return power, prefixless
+        end
+    end
+    return 0, Unit(x)
+end
+function remove_prefix(x::Unit)
+    total_prefix_power = 0
+    out_unit = Unitless
+    for (symbol, power) in x.d
+        prefix_power, prefixless = remove_prefix(symbol)
+        total_prefix_power += prefix_power
+        out_unit *= prefixless
+    end
+    return total_prefix_power, out_unit
+end
+function remove_prefix(x::Quantity)
+    power, prefixless = remove_prefix(x.unit)
+    return Quantity(x.value*10^float64(power), prefixless)
+end
+function *(x::Prefix, y::Quantity)
+    length(y.unit.d) == 1 ? 0 : error("Prefix*Quantity only defined for Quantities with only one unit")
+    for (symbol, power) in y.unit.d
+        return Quantity(y.value, Unit(x.symbol*symbol)^power)
+    end
+end
+.*(x::Prefix, y::Quantity) = x*y
+*(x::Quantity, y::Prefix) = error("Quantity*Prefix not allowed, use Prefix*Quantity")
+
+export QUnit, NewPrefix, asbase, as
 
 end #end module
 

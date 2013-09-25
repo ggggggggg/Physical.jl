@@ -47,6 +47,7 @@ const a_bohr = 5.2917721092e-11*Meter
 
 
 export as, asbase, QUnit
+export Uncertain
 export Meter, Second, KiloGram, Kilogram, Kelvin, Mole, Candela, Newton, Joule, Coulomb, Ohm, Radian, Volt, Ampere
 
 end # end module

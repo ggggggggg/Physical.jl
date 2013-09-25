@@ -1,4 +1,4 @@
-```Physical``` provides simple support for units in Julia, as well a nice set of predefined units and constants. So lets start with an example
+```Physical``` provides simple support for units in Julia, as well a nice set of predefined units and constants. The key are the types `Quantity` and `Unit`, but mostly you should just multiply by predefined unit constants.
 
 ```
 julia> using Physical
@@ -54,5 +54,19 @@ julia> QUnit("kg", 0.0685217659*Slug)
 julia> asbase(KiloGram)
 0.0685217659 slug 
 ```
-
-Planned features: LaTex printing in iJulia, a function that guesses a nice ways to simplifiy the units. Maximally accurate fundamental units from CODATA. 
+There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself.
+```
+julia> a = Uncertain(100,1)
+100.0 ± 1.0
+julia> b = Uncertain(10,5)
+10.0 ± 5.0
+julia> a*b
+1000.0 ± 500.09999000199946
+julia> a-b
+90.0 ± 5.0990195135927845
+julia> a+b
+110.0 ± 5.0990195135927845
+julia> (a*b*Meter)^2
+1.0e6 ± 1.0001999800039988e6 m²
+```
+Planned features: LaTex printing in iJulia, a function that guesses a nice ways to simplifiy the units. Maximally accurate fundamental units from CODATA. Round properly when displaying Uncertain numbers.

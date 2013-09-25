@@ -110,11 +110,13 @@ function NewPrefix(symbol::String, power::Int)
     return Prefix(convert(UTF8String, symbol))
 end
 function remove_prefix(x::UTF8String)
-    for i = 1:length(x)-1
-        symbol = x[1:i]
-        if haskey(PrefixSystem, symbol)
-            power, prefixless = PrefixSystem[symbol], Unit(x[i+1:end])
-            return power, prefixless
+    if !haskey(UnitSystem, x)
+        for i = 1:length(x)-1
+            symbol = x[1:i]
+            if haskey(PrefixSystem, symbol)
+                power, prefixless = PrefixSystem[symbol], Unit(x[i+1:end])
+                return power, prefixless
+            end
         end
     end
     return 0, Unit(x)

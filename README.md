@@ -70,10 +70,10 @@ julia> (a*b*Meter)^2
 1.0e6 ± 1.0001999800039988e6 m²
 ```
 Future features
-- [] LaTex printing in iJulia
-- [] Guesses at pretty unit reduction
-- [] Maximally accurate fundamental units from CODATA
-- [] Round properly when displaying Uncertain numbers
-- [] Prefixs
+- [ ] LaTex printing in iJulia
+- [ ] Guesses at pretty unit reduction
+- [ ] Maximally accurate fundamental units from CODATA
+- [ ] Round properly when displaying Uncertain numbers
+- [ ] Prefixs
 
 Feel free to start an issue if you have any problems or questions or just want to get in contact with me.

@@ -14,11 +14,14 @@ Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # retu
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 
 default_unit_system = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
-QUnit(x::String) = Quantity(1,Unit(x))
+function QUnit(x::String, system=default_unit_system)
+    delete!(system, x) # remove from unit system to mark as base unit
+    return Quantity(1,Unit(x))
+end
 function QUnit(x::String, y::Quantity, system=default_unit_system)
     x=convert(UTF8String, x)
     system[x] = y
-    return QUnit(x)
+    return Quantity(1,Unit(x))
 end
 function asbase(x::Quantity, system=default_unit_system)
     out=x.value
@@ -44,7 +47,7 @@ function asbase(x::Unit, system=default_unit_system)
 end
 function as(from::Quantity, to::Quantity, system=default_unit_system) # warning, ignores the value of to, only looks at the units
     out = Quantity(1, to.unit)
-    f,t = asbase(from, system), asbase(to, system)
+    f,t = asbase(from, system), asbase(out, system)
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
     return out
 end
@@ -73,11 +76,15 @@ end
 .^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
 isapprox(x::Quantity, y::Quantity) = x.unit == y.unit && isapprox(x.value, y.value)
 for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
-    @eval ($f)(x::Quantity, y::Quantity) = x.unit == y.unit && ($f)(x.value,y.value)
+    @eval begin function ($f)(x::Quantity, y::Quantity)
+                    a = asbase(x)
+                    b = asbase(y)
+                    a.unit == b.unit && ($f)(a.value,b.value)
+                end end
 end
 sqrt(x::Quantity) = Quantity_(sqrt(x.value), x.unit)
 getindex(x::Quantity, y...) = Quantity_(getindex(x.value, y...),x.unit)
-setindex!(x::Quantity, y::Quantity, z...) = x.unit == y.unit ? setindex!(x.value, y.value, z...) : error("x[z]=y requires same units for x and y, x.unit=$(x.unit), y.unit=$(y.unit)")
+setindex!(x::Quantity, y::Quantity, z...) = setindex!(x.value, as(y,x).value, z...)
 setindex!(x::Quantity, y, z...) = error("x[z]=y reqires same units, x.unit=$(x.unit), y has no units. use x[z] = y*same_units or x.value[z] = y instead")
 size(x::Quantity) = size(x.value)
 ndims(x::Quantity) = ndims(x.value)

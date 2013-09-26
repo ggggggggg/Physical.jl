@@ -43,6 +43,8 @@ function *(x::Unit, y::Unit)
     z = Unit()
     combined_units = union(keys(x.d), keys(y.d))
     for u in combined_units
+        # round to float32 precision so we dont end up with m^1e-12
+        # going all the way to float32 precision is probably overkill
         new_exponent = float64(float32(defaultget(x.d,u)+defaultget(y.d,u))) # round to float32 precision
         if new_exponent != 0.0
                 z.d[u] = new_exponent
@@ -50,7 +52,7 @@ function *(x::Unit, y::Unit)
     end
     return z
 end
-function ^(x::Unit,y::Integer)
+function ^(x::Unit,y::Integer) # there must be a shorter way to define ^
     z = Unit()
     for (k,v) in x.d
             z.d[k] = v*y
@@ -90,7 +92,7 @@ end
 
 
 # printing Text
-superscript(i) = map(repr(i)) do c
+superscript(i) = map(repr(i)) do c # this can be compressed, replace \u with unicode
     c   ==  '-' ? '\u207b' :
     c   ==  '1' ? '\u00b9' :
     c   ==  '2' ? '\u00b2' :

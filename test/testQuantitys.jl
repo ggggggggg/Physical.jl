@@ -21,6 +21,10 @@ R = 10*Ohm
 @test R*Ampere/Volt == R/Ohm
 @test Ohm == Volt/Ampere
 
+@test Second*(1/Second) == 1
+@test Meter*(1/Meter) == 1
+@test Meter*([1,2,3]./Meter) == [1,2,3]
+
 # change base unit
 const Slug = QUnit("slug")
 QUnit("kg", 0.0685217659*Slug)

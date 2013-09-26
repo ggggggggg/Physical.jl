@@ -65,12 +65,12 @@ end
 .*(x::QValue, y::Quantity) = y.*x
 /{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value/y.value, x.unit/y.unit)
 /(x::Quantity, y::QValue) = Quantity_(x.value/y, x.unit)
-/(x::QValue, y::Quantity) = y/x
+/(x::QValue, y::Quantity) = Quantity_(x/y.value, y.unit^-1)
 ./{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value./y.value, x.unit./y.unit)
 ./(x::Quantity, y::QValue) = Quantity_(x.value./y, x.unit)
-./(x::QValue, y::Quantity) = y./x
-+{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value+y.value, x.unit) : error("x=$x cannot add with y=$y because units are not equal")
--{T,S}(x::Quantity{T}, y::Quantity{S}) = x.unit == y.unit ? Quantity_(x.value-y.value, x.unit) : error("x=$x cannot subtract with y=$y because units are not equal")
+./(x::QValue, y::Quantity) = Quantity_(x/y.value, y.unit^-1)
++{T,S}(x::Quantity{T}, y::Quantity{S}) = x + as(y,x)
+-{T,S}(x::Quantity{T}, y::Quantity{S}) = x - as(y,x)
 -{T}(x::Quantity{T}) = Quantity_(-x.value, x.unit)
 ^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^convert(FloatingPoint,y), x.unit^convert(FloatingPoint,y))
 ^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^convert(FloatingPoint,y), x.unit^convert(FloatingPoint,y))

@@ -4,24 +4,26 @@ using PUnits
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox
 
-
-
-
-typealias QValue  Union(Number, AbstractArray)
-abstract HasUnits
-type Quantity{T<:QValue} <: HasUnits
+typealias QValue  Union(Number, AbstractArray) # things that go inside a Quantity
+# Quantity is where most of the action happens
+# Quantity combines a value with some units
+# Quantitys can be reduced to base units via asbase, which uses the UnitSytem Dict
+# all other conversions are based on asbase
+type Quantity{T<:QValue}
     value::T
     unit::Unit
 end
 Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
-
+# UnitSytem by example with SI units
+# UnitSystem["J"] = a quantity with other units that is equal to a Joule
+# UnitSystem["m"] does not exist, which marks "m" as a base unit
 UnitSystem = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
-function QUnit(x::String, system=UnitSystem)
+function QUnit(x::String, system=UnitSystem) # consider renaming as BaseUnit
     haskey(system,x) ? delete!(system, x) : 0 # remove from unit system to mark as base unit
     return Quantity(1,Unit(x))
 end
-function QUnit(x::String, y::Quantity, system=UnitSystem)
+function QUnit(x::String, y::Quantity, system=UnitSystem) # consider renaming DerivedUnit
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))
@@ -55,6 +57,7 @@ function as(from::Quantity, to::Quantity, system=UnitSystem) # warning, ignores 
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
     return out
 end
+# this is purposfully the only way to use a Prefix
 *(x::Prefix, y::Quantity) = length(y.unit.d) == 1 ? Quantity(y.value, x*y.unit) : error("Prefix*Quantity only defined for Quantities with only one unit")
 
 *{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)

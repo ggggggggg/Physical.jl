@@ -1,6 +1,6 @@
 module PUnits
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
-
+# UnitSymbol was added to support prefixes
 type UnitSymbol
     sym::UTF8String # unit symbol, ie "m"
     pre::Int16      # integer representing power of 10 of prefix, ie 3 represents kilo
@@ -16,6 +16,8 @@ function Prefix(sym::String, pre::Int)
     PrefixSystem[int16(pre)] = convert(UTF8String, sym)
     return Prefix(int16(pre))
 end
+# Unit keeps track of unit symbols and powers, it has no idea how a symbol relates to
+# any other symbol
 type Unit
         d::Dict{UnitSymbol, Float64} # dict of exponents for unitsymbols
 end

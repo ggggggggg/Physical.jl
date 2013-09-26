@@ -10,8 +10,8 @@ const m_electron = 9.10938291*KiloGram
 const m_proton = 1.672621777*Kilogram
 const a_bohr = 5.2917721092e-11*Meter
 const u0_magnetic = 4e-7*pi*Newton*Ampere^-2
-const e0_electric = 1/(u_magnetic*c_light^2)
-const z0_freespace = u_magnetic*e0_electric
+const e0_electric = 1/(u0_magnetic*c_light^2)
+const z0_freespace = u0_magnetic*e0_electric
 const k_coulomb = 1/(4*pi*e0_electric)
 const u_bohr = e_electron*hbar_plank/(2*m_electron)
 const conductance_quantum = 2*e_electron/h_plank
@@ -24,7 +24,7 @@ const rydberg_const = alpha_fine_structure^2*m_electron*c_light/(2*h_plank)
 
 const ElectronVolt = QUnit("eV", e_electron*Volt)
 const Angstrom = QUnit("Å", 1e-10*Meter)
-const Fermi = QUnit("F", Fermi*Meter)
+const Fermi = QUnit("F", Femto*Meter)
 const Phi0_flux = QUnit("ϕ₀", phi0_flux)
 const H_plank = QUnit("h", h_plank)
 const Hbar_plank = QUnit("ħ", hbar_plank)
@@ -37,7 +37,7 @@ const N_avagadro = QUnit("Nₐ", n_avagadro)
 
 
 export k_boltzman, n_avagadro, h_plank, hbar_plank, g_gravitation, g_earth_gravity, c_light
-export e_electron, m_electron, m_proton, a_bohr, u_magnetic, e0_electric, z0_freespace,
+export e_electron, m_electron, m_proton, a_bohr, u0_magnetic, e0_electric, z0_freespace
 export k_coulomb, u_bohr, conductance_quantum, k_josephson, phi0_flux, u_nuclear, alpha_fine_structure
 export rydberg_const
 

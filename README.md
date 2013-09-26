@@ -2,15 +2,20 @@
 
 ```
 julia> using Physical
-julia> d = 17*(Milli*Meter)
-17 mm 
 julia> f = 1*ElectronVolt/H_plank
 1.0 eV h⁻¹
+julia> asbase(f)
+2.4270444990211597e14 s⁻¹
+julia> f+1e9*(Mega*Hertz)
+5.120237599283019 eV h⁻¹
+julia> 1e9*(Mega*Hertz)+f
+1.242704449902116e9 MHz 
 
 ```
 Using units is as simple as multiplying any number or array by the predefined unit constants. Once you are using units it will keep you from doing stupid things like
 ```
-julia> d+f
+julia> d = 17*(Milli*Meter)
+17 mm 
 julia> d+f
 ERROR: incompatible base units s⁻¹ and m 
 ```

@@ -48,7 +48,7 @@ julia> asbase(12*Foot*Pound)
 16.269815397312 m²kg s⁻²
 julia> as(12*Foot*Pound, Newton*Meter)
 16.269815397312 m N 
-julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argument doesn't do anything
+julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argument doesn't matter
 16.269815397312 m N 
 ```
 

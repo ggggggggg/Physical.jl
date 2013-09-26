@@ -1,6 +1,6 @@
-include("Units.jl")
+include("PUnits.jl")
 module Quantitys
-using Units
+using PUnits
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox
 
@@ -27,24 +27,24 @@ function QUnit(x::String, y::Quantity, system=UnitSystem)
     return Quantity(1,Unit(x))
 end
 function asbase(x::Quantity, system=UnitSystem)
-    y = remove_prefix(x)
-    out=y.value
-    for (symbol,n) in y.unit.d
-        if haskey(system,symbol)
-            out *= asbase(system[symbol], system)^n
+    prefactor, prefixless_unit = remove_prefix(x.unit)
+    out=prefactor*x.value
+    for (unitsymbol,n) in prefixless_unit.d
+        if haskey(system,unitsymbol.sym)
+            out *= asbase(system[unitsymbol.sym], system)^n
         else # if it doesn't have they key, then symbol is a base unit
-            out *= QUnit(symbol)^n
+            out *= QUnit(unitsymbol.sym)^n
         end
     end
     return out
 end
 function asbase(x::Unit, system=UnitSystem)
     out=Unitless
-    for (symbol,n) in x.d
-        if haskey(system,symbol)
-            out *= asbase(system[symbol].unit, system)^n
+    for (unitsymbol,n) in x.d
+        if haskey(system,unitsymbol.sym)
+            out *= asbase(system[unitsymbol.sym].unit, system)^n
         else # if it doesn't have they key, then symbol is a base unit
-            out *= Unit(symbol)^n
+            out *= Unit(unitsymbol.sym)^n
         end
     end
     return out
@@ -55,7 +55,7 @@ function as(from::Quantity, to::Quantity, system=UnitSystem) # warning, ignores 
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
     return out
 end
-
+*(x::Prefix, y::Quantity) = length(y.unit.d) == 1 ? Quantity(y.value, x*y.unit) : error("Prefix*Quantity only defined for Quantities with only one unit")
 
 *{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
 *(x::Quantity, y::QValue) = Quantity_(x.value*y, x.unit)
@@ -78,7 +78,6 @@ end
 .^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
 .^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
 .^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
-isapprox(x::Quantity, y::Quantity) = x.unit == y.unit && isapprox(x.value, y.value)
 for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
     @eval begin function ($f)(x::Quantity, y::Quantity)
                     a = asbase(x)
@@ -101,50 +100,7 @@ function show{T}(io::IO, x::Quantity{T})
     show(io, x.unit)
 end
 
-type Prefix
-    symbol::UTF8String
-end
-PrefixSystem = Dict{UTF8String, Int16}()
-function NewPrefix(symbol::String, power::Int)
-    PrefixSystem[symbol] = int16(power)
-    return Prefix(convert(UTF8String, symbol))
-end
-function remove_prefix(x::UTF8String)
-    if !haskey(UnitSystem, x)
-        for i = 1:length(x)-1
-            symbol = x[1:i]
-            if haskey(PrefixSystem, symbol)
-                power, prefixless = PrefixSystem[symbol], Unit(x[i+1:end])
-                return power, prefixless
-            end
-        end
-    end
-    return 0, Unit(x)
-end
-function remove_prefix(x::Unit)
-    total_prefix_power = 0
-    out_unit = Unitless
-    for (symbol, power) in x.d
-        prefix_power, prefixless = remove_prefix(symbol)
-        total_prefix_power += prefix_power
-        out_unit *= prefixless
-    end
-    return total_prefix_power, out_unit
-end
-function remove_prefix(x::Quantity)
-    power, prefixless = remove_prefix(x.unit)
-    return Quantity(x.value*10^float64(power), prefixless)
-end
-function *(x::Prefix, y::Quantity)
-    length(y.unit.d) == 1 ? 0 : error("Prefix*Quantity only defined for Quantities with only one unit")
-    for (symbol, power) in y.unit.d
-        return Quantity(y.value, Unit(x.symbol*symbol)^power)
-    end
-end
-.*(x::Prefix, y::Quantity) = x*y
-*(x::Quantity, y::Prefix) = error("Quantity*Prefix not allowed, use Prefix*Quantity")
-
-export QUnit, NewPrefix, asbase, as
+export QUnit, Prefix, asbase, as
 
 end #end module
 

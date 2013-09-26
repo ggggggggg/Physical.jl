@@ -2,15 +2,17 @@
 
 ```
 julia> using Physical
-julia> d = 1*Meter
-1 m 
-julia> f = 1*Joule/Physical.h_plank
-1.5091903117461535e33 s⁻¹
+julia> d = 17*(Milli*Meter)
+17 mm 
+julia> f = 1*ElectronVolt/H_plank
+1.0 eV h⁻¹
+
 ```
 Using units is as simple as multiplying any number or array by the predefined unit constants. Once you are using units it will keep you from doing stupid things like
 ```
 julia> d+f
-ERROR: x=1 m  cannot add with y=1.5091903117461535e33 s⁻¹ because units are not equal
+julia> d+f
+ERROR: incompatible base units s⁻¹ and m 
 ```
 
 Say you want to call ``sin``, but you want to be sure that the argument is in radians?
@@ -74,6 +76,5 @@ Future features
 - [ ] Guesses at pretty unit reduction
 - [ ] Maximally accurate fundamental units from CODATA
 - [ ] Round properly when displaying Uncertain numbers
-- [ ] Prefixs
 
 Feel free to start an issue if you have any problems or questions or just want to get in contact with me.

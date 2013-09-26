@@ -5,10 +5,10 @@ am = a*Meter
 b = rand()
 bu = b*Newton
 c=BigFloat(2)*Meter
+import Physical.Quantitys.PUnits.UnitSymbol
 
 @test isapprox((am^3.0*bu)/(Meter^3.0*Newton), a^3.0*b)
 @test isapprox((am^3.0*bu), a^3.0*b*(Meter^3.0*Newton))
-import Physical.Quantitys.PUnits.UnitSymbol
 @test UnitSymbol("m",0) == UnitSymbol("m",0)
 a = rand(5)*Newton
 @test_throws a[1] = 1
@@ -46,3 +46,10 @@ C = QUnit("C", 2*A*B)
 D = QUnit("D", 2*A*B*C)
 asbase(D)
 as(A*B*C, D)
+
+# now with prefixes
+
+@test Milli*Meter == 1//1000*Meter
+@test Milli*Newton == 1//1000*Newton
+@test_throws a = Milli*Milli*Meter
+@test (Milli*Meter)*(Mega*Physical.ElectronVolt) == (Kilo*Meter)*Physical.ElectronVolt

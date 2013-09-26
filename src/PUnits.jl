@@ -6,6 +6,8 @@ type UnitSymbol
     pre::Int16      # integer representing power of 10 of prefix, ie 3 represents kilo
 end
 UnitSymbol(sym::String, pre::Int) = UnitSymbol(convert(UTF8String, sym), int16(pre))
+Base.hash(x::UnitSymbol) = hash("$(x.sym),$(x.pre)") # make UnitSymbol act nice with Dict
+Base.isequal(x::UnitSymbol, y::UnitSymbol) = x.sym==y.sym && x.pre==y.pre
 PrefixSystem = Dict{Int16, UTF8String}()
 type Prefix
     pre::Int16
@@ -116,16 +118,7 @@ function show(io::IO,x::Unit)
         end
     end
 end
-function show(io::IO, unitsymbol::UnitSymbol)
-    if haskey(PrefixSystem, unitsymbol.pre)
-        print(io, PrefixSystem[unitsymbol.pre]*unitsymbol.sym)
-    else
-        print(io,"(10"*superscript(unitsymbol.pre)*unitsymbol.sym*")")
-    end
-end
-function show(io::IO, prefix::Prefix)
-    print(io, "Prefix $(prefix.pre) => "*get(PrefixSystem, prefix.pre, "10"*superscript(prefix.pre)))
-end
+
 
 export Unit, Unitless, Prefix, remove_prefix
 

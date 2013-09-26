@@ -8,7 +8,8 @@ c=BigFloat(2)*Meter
 
 @test isapprox((am^3.0*bu)/(Meter^3.0*Newton), a^3.0*b)
 @test isapprox((am^3.0*bu), a^3.0*b*(Meter^3.0*Newton))
-
+import Physical.Quantitys.PUnits.UnitSymbol
+@test UnitSymbol("m",0) == UnitSymbol("m",0)
 a = rand(5)*Newton
 @test_throws a[1] = 1
 @test_throws a[1] = 1*Meter

@@ -21,3 +21,6 @@ const Femto = Prefix("f",-15)
 const Atto = Prefix("a",-18)
 const Zepto = Prefix("z",-21)
 const Yocto = Prefix("y",-24)
+
+export Yotta, Zetta, Exa, Peta, Tera, Giga, Mega, Kilo, Hecto, Deka, Deci, Centi, Milli
+export Micro, Nano, Pico, Femto, Atto, Zepto, Yocto

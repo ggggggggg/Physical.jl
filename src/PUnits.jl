@@ -118,7 +118,16 @@ function show(io::IO,x::Unit)
         end
     end
 end
-
+function show(io::IO, unitsymbol::UnitSymbol)
+    if haskey(PrefixSystem, unitsymbol.pre)
+        print(io, PrefixSystem[unitsymbol.pre]*unitsymbol.sym)
+    else
+        print(io,"(10"*superscript(unitsymbol.pre)*unitsymbol.sym*")")
+    end
+end
+function show(io::IO, prefix::Prefix)
+    print(io, "Prefix $(prefix.pre) => "*get(PrefixSystem, prefix.pre, "10"*superscript(prefix.pre)))
+end
 
 export Unit, Unitless, Prefix, remove_prefix
 

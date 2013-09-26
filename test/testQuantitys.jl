@@ -24,6 +24,9 @@ R = 10*Ohm
 @test Second*(1/Second) == 1
 @test Meter*(1/Meter) == 1
 @test Meter*([1,2,3]./Meter) == [1,2,3]
+@test ElectronVolt + Joule == Joule + ElectronVolt
+@test (ElectronVolt+Joule).unit != (Joule+ElectronVolt).unit
+@test Joule - Mega*ElectronVolt < Joule
 
 # change base unit
 const Slug = QUnit("slug")

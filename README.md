@@ -5,7 +5,7 @@ julia> using Physical
 julia> f = 1*ElectronVolt/H_plank # H_plank is in units of h, so resulting expression have units with h
 1.0 eV h⁻¹
 julia> asbase(f)
-2.4270444990211597e14 s⁻¹ # all Quantities can be reduec to base units
+2.4270444990211597e14 s⁻¹ # all Quantities can be reduced to base units
 julia> f+1e9*(Mega*Hertz)
 5.120237599283019 eV h⁻¹
 julia> 1e9*(Mega*Hertz)+f # adding compatible Quantities casts to units of the first Quantity

@@ -1,0 +1,26 @@
+# NewPrefix(prefix_symbol, power_of_ten)
+# Be careful not to define anything that conflicts with units
+const Yotta = Prefix("Y",24)
+const Zetta = Prefix("Z",21)
+const Exa = Prefix("E",18)
+const Peta = Prefix("P",15)
+const Tera = Prefix("T",12)
+const Giga = Prefix("G",9)
+const Mega = Prefix("M",6)
+const Kilo = Prefix("k",3)
+const Hecto = Prefix("h",2)
+const Deka = Prefix("da",1)
+const Deci = Prefix("d",-1)
+             Prefix("",0)
+const Centi = Prefix("c",-2)
+const Milli = Prefix("m",-3)
+const Micro = Prefix("µ",-6)
+const Nano = Prefix("n",-9)
+const Pico = Prefix("p",-12)
+const Femto = Prefix("f",-15)
+const Atto = Prefix("a",-18)
+const Zepto = Prefix("z",-21)
+const Yocto = Prefix("y",-24)
+
+export Yotta, Zetta, Exa, Peta, Tera, Giga, Mega, Kilo, Hecto, Deka, Deci, Centi, Milli
+export Micro, Nano, Pico, Femto, Atto, Zepto, Yocto

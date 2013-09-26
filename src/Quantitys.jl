@@ -1,8 +1,11 @@
-include("Units.jl")
+include("PUnits.jl")
 module Quantitys
-using Units
+using PUnits
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox
+
+
+
 
 typealias QValue  Union(Number, AbstractArray)
 abstract HasUnits
@@ -13,45 +16,46 @@ end
 Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 
-default_unit_system = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
-function QUnit(x::String, system=default_unit_system)
-    delete!(system, x) # remove from unit system to mark as base unit
+UnitSystem = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+function QUnit(x::String, system=UnitSystem)
+    haskey(system,x) ? delete!(system, x) : 0 # remove from unit system to mark as base unit
     return Quantity(1,Unit(x))
 end
-function QUnit(x::String, y::Quantity, system=default_unit_system)
+function QUnit(x::String, y::Quantity, system=UnitSystem)
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))
 end
-function asbase(x::Quantity, system=default_unit_system)
-    out=x.value
-    for (symbol,n) in x.unit.d
-        if haskey(system,symbol)
-            out *= asbase(system[symbol], system)^n
+function asbase(x::Quantity, system=UnitSystem)
+    prefactor, prefixless_unit = remove_prefix(x.unit)
+    out=prefactor*x.value
+    for (unitsymbol,n) in prefixless_unit.d
+        if haskey(system,unitsymbol.sym)
+            out *= asbase(system[unitsymbol.sym], system)^n
         else # if it doesn't have they key, then symbol is a base unit
-            out *= QUnit(symbol)^n
+            out *= QUnit(unitsymbol.sym)^n
         end
     end
     return out
 end
-function asbase(x::Unit, system=default_unit_system)
+function asbase(x::Unit, system=UnitSystem)
     out=Unitless
-    for (symbol,n) in x.d
-        if haskey(system,symbol)
-            out *= asbase(system[symbol].unit, system)^n
+    for (unitsymbol,n) in x.d
+        if haskey(system,unitsymbol.sym)
+            out *= asbase(system[unitsymbol.sym].unit, system)^n
         else # if it doesn't have they key, then symbol is a base unit
-            out *= Unit(symbol)^n
+            out *= Unit(unitsymbol.sym)^n
         end
     end
     return out
 end
-function as(from::Quantity, to::Quantity, system=default_unit_system) # warning, ignores the value of to, only looks at the units
+function as(from::Quantity, to::Quantity, system=UnitSystem) # warning, ignores the value of to, only looks at the units
     out = Quantity(1, to.unit)
     f,t = asbase(from, system), asbase(out, system)
     f.unit == t.unit ? out *= f.value./t.value : error("incompatible base units $(f.unit) and $(t.unit)")
     return out
 end
-
+*(x::Prefix, y::Quantity) = length(y.unit.d) == 1 ? Quantity(y.value, x*y.unit) : error("Prefix*Quantity only defined for Quantities with only one unit")
 
 *{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
 *(x::Quantity, y::QValue) = Quantity_(x.value*y, x.unit)
@@ -74,7 +78,6 @@ end
 .^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
 .^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
 .^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
-isapprox(x::Quantity, y::Quantity) = x.unit == y.unit && isapprox(x.value, y.value)
 for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
     @eval begin function ($f)(x::Quantity, y::Quantity)
                     a = asbase(x)
@@ -97,7 +100,7 @@ function show{T}(io::IO, x::Quantity{T})
     show(io, x.unit)
 end
 
-export QUnit, asbase, as
+export QUnit, Prefix, asbase, as
 
 end #end module
 

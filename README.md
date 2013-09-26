@@ -2,17 +2,17 @@
 
 ```
 julia> using Physical
-julia> f = 1*ElectronVolt/H_plank
+julia> f = 1*ElectronVolt/H_plank # H_plank is in units of h, so resulting expression have units with h
 1.0 eV h⁻¹
 julia> asbase(f)
-2.4270444990211597e14 s⁻¹
+2.4270444990211597e14 s⁻¹ # all Quantities can be reduec to base units
 julia> f+1e9*(Mega*Hertz)
 5.120237599283019 eV h⁻¹
 julia> 1e9*(Mega*Hertz)+f # adding compatible Quantities casts to units of the first Quantity
 1.242704449902116e9 MHz 
 
 ```
-Using units is as simple as multiplying any number or array by the predefined unit constants. Once you are using units it will keep you from doing stupid things like
+Using units is as simple as multiplying any number or array by the predefined unit constants. Using units it will keep you from doing stupid things like
 ```
 julia> d = 17*(Milli*Meter)
 17 mm 
@@ -52,7 +52,7 @@ julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argum
 16.269815397312 m N 
 ```
 
-```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit. Both of these will overwrite existing units. I'm going to use this to switch my base mass unit to the slug.
+```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit. Both of these will overwrite existing units. I'm going to use this to switch my base mass unit to the slug. The unit system and constants are defined by a few files in ``.Julia/Physical/data``.  If you add a ``.jl`` file to the ``data`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded.
 ```
 julia> Slug = QUnit("slug")
 1 slug 

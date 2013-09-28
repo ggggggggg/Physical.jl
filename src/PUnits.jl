@@ -92,21 +92,9 @@ end
 
 
 # printing Text
-superscript(i) = map(repr(i)) do c # this can be compressed, replace \u with unicode
-    c   ==  '-' ? '\u207b' :
-    c   ==  '1' ? '\u00b9' :
-    c   ==  '2' ? '\u00b2' :
-    c   ==  '3' ? '\u00b3' :
-    c   ==  '4' ? '\u2074' :
-    c   ==  '5' ? '\u2075' :
-    c   ==  '6' ? '\u2076' :
-    c   ==  '7' ? '\u2077' :
-    c   ==  '8' ? '\u2078' :
-    c   ==  '9' ? '\u2079' :
-    c   ==  '0' ? '\u2070' :
-    c   ==  '.' ? '\u00b7' :
-    error("Unexpected Chatacter")
-end
+
+superscript(c::Char) = "⁰¹²³⁴⁵⁶⁷⁸⁹·⁻"[[1,4,6,8,10,13,16,19,22,25,28,30][search("0123456789.-", c)]]
+superscript(x::Number) = map(superscript,repr(x))
 prettyround(x::Float64) = x%1 == 0 ? int64(round(x)) : x
 function show(io::IO,x::Unit)
     if isempty(x.d)

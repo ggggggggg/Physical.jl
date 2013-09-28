@@ -57,7 +57,7 @@ end
 sprintf_signif(x::Uncertain) = sprintf("%0.$(iceil(log10(x.v/x.u)))f", x.v)
 sprintf(fmt::String,args...) = @eval @sprintf($fmt,$(args...))
 # because of the macro @sprintf its hard to do dynamic precision strings https://groups.google.com/forum/#!msg/julia-dev/P50UdTGKkRI/KCPnQ6LqH44J
-
+# more discussion: https://github.com/JuliaLang/julia/issues/4248#issuecomment-24196846
 
 export Uncertain
 end

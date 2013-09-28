@@ -1,7 +1,6 @@
 include("Quantitys.jl")
-include("Uncertainty.jl")
 module Physical
-using Quantitys, Uncertainty
+using Quantitys
 export as, asbase, QUnit, Prefix
 export Uncertain
 

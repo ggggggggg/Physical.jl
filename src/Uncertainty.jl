@@ -49,11 +49,13 @@ convert{T<:FloatingPoint, S<:FloatingPoint}(::Type{Uncertain{T}}, x::Uncertain{S
 #convert(::Type{Uncertain{BigFloat}}, x::Uncertain) = Uncertain(convert(BigFloat, x.v), convert(BigFloat,x.u))
 
 function show(io::IO, x::Uncertain)
-    show(io, x.v)
+    xv_signif = sprintf_signif(x)
+    print(io, xv_signif)
     print(io, " ± ")
     show(io, x.u)
 end
-n_signif(x::Uncertain) = iceil(log10(x.v/x.u))
+sprintf_signif(x::Uncertain) = sprintf("%0.$(iceil(log10(x.v/x.u)))f", x.v)
+sprintf(fmt::String,args...) = @eval @sprintf($fmt,$(args...))
 # because of the macro @sprintf its hard to do dynamic precision strings https://groups.google.com/forum/#!msg/julia-dev/P50UdTGKkRI/KCPnQ6LqH44J
 
 

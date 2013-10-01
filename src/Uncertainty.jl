@@ -56,7 +56,7 @@ end
 n_signif(x::Uncertain) = iceil(log10(x.v/x.u))
 signif(x::Uncertain) = Uncertain(signif(x.v,n_signif(x)),x.u)
 
-
+# try to show an appropriate number of significant digits
 function sprintf_signif(x::Uncertain) 
 	n = n_signif(x)
 	n <= 1 ? (return repr(x.v), repr(x.u)) : 0

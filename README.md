@@ -35,7 +35,7 @@ julia> R*17*Ampere/(14*Volt)
  3.64286
  4.85714
 ```
-Create new units with ```QUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
+Create new units with ```DerivedUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
 ```
 julia> Foot = QUnit("ft", 0.3048*Meter)
 julia> Pound = QUnit("lb", 4.44822162*Newton)
@@ -47,14 +47,14 @@ julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argum
 16.269815397312 m N 
 ```
 
-```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit. Both of these will overwrite existing units. I'm going to use this to switch my base mass unit to the slug.
+```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantitys.jl``` if you want to replace a prefixed base unit like kg.
 ```
-julia> Slug = QUnit("slug")
-1 slug 
-julia> QUnit("kg", 0.0685217659*Slug)
-1 kg 
-julia> asbase(KiloGram)
-0.0685217659 slug 
+julia> Foot = BaseUnit("ft")
+1 ft 
+julia> DerivedUnit("m", 3.28084*Foot)
+1 m 
+julia> asbase(Meter)
+3.28084 ft
 ```
 There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself.
 ```

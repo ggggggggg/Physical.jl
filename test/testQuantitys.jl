@@ -60,3 +60,7 @@ as(A*B*C, D)
 @test Milli*Newton == 1//1000*Newton
 @test_throws a = Milli*Milli*Meter
 @test (Milli*Meter)*(Mega*Physical.ElectronVolt) == (Kilo*Meter)*Physical.ElectronVolt
+
+# and prefixes with a prefixed base unit
+@test isapprox(Nano*KiloGram, 1e-9*KiloGram)
+@test isapprox(Nano*Gram, 1e-12*KiloGram)

@@ -20,6 +20,7 @@ Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 # UnitSystem["J"] = a quantity with other units that is equal to a Joule
 # UnitSystem["m"] does not exist, which marks "m" as a base unit
 UnitSystem = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+reset_unit_system() = [pop!(UnitSystem, k) for (k,v) in UnitSystem]
 function QUnit(x::String, system=UnitSystem) # consider renaming as BaseUnit
     haskey(system,x) ? delete!(system, x) : 0 # remove from unit system to mark as base unit
     return Quantity(1,Unit(x))

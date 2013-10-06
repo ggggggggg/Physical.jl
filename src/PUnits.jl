@@ -9,6 +9,7 @@ UnitSymbol(sym::String, pre::Int) = UnitSymbol(convert(UTF8String, sym), int16(p
 Base.hash(x::UnitSymbol) = hash("$(x.sym),$(x.pre)") # make UnitSymbol act nice with Dict
 Base.isequal(x::UnitSymbol, y::UnitSymbol) = x.sym==y.sym && x.pre==y.pre
 PrefixSystem = Dict{Int16, UTF8String}()
+reset_prefix_system() = [pop!(PrefixSystem, k) for (k,v) in PrefixSystem]
 type Prefix
     pre::Int16
 end

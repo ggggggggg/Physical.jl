@@ -40,7 +40,7 @@ julia> R*17*Ampere/(14*Volt)
  3.64286
  4.85714
 ```
-Create new units with ```QUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
+Create new units with ```DerivedUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
 ```
 julia> Foot = QUnit("ft", 0.3048*Meter)
 julia> Pound = QUnit("lb", 4.44822162*Newton)
@@ -52,34 +52,35 @@ julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argum
 16.269815397312 m N 
 ```
 
+<<<<<<< HEAD
 ```QUnit(x::String)``` creates a new base unit.  ```QUnit(x::String, y::Quantity)``` creates a new derived unit. Both of these will overwrite existing units. I'm going to use this to switch my base mass unit to the slug. The unit system and constants are defined by a few files in ``.Julia/Physical/data``.  If you add a ``.jl`` file to the ``data`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded.
+=======
+```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantitys.jl``` if you want to replace a prefixed base unit like kg. ``.julia/Physical/data``.  If you add a ``.jl`` file to the ``data/default`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded. Also you can define a totally different unit system in without messing with ```default```, take a look at ```data/what_to_load.jl```.
+>>>>>>> devel
 ```
-julia> Slug = QUnit("slug")
-1 slug 
-julia> QUnit("kg", 0.0685217659*Slug)
-1 kg 
-julia> asbase(KiloGram)
-0.0685217659 slug 
+julia> Foot = BaseUnit("ft")
+1 ft 
+julia> DerivedUnit("m", 3.28084*Foot)
+1 m 
+julia> asbase(Meter)
+3.28084 ft
 ```
-There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself.
+There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself. It usually chooses a reasonable format given the number of significant digits.  If there is only one significant digit or less it will print out the entire representation of the value and uncertainty, because that usually means something has gone wrong.  There is room to improve the choice of representations.
 ```
 julia> a = Uncertain(100,1)
-100.0 ± 1.0
-julia> b = Uncertain(10,5)
-10.0 ± 5.0
-julia> a*b
-1000.0 ± 500.09999000199946
-julia> a-b
-90.0 ± 5.0990195135927845
+100 ± 1.0
+julia> b = Uncertain(50,0.4)
+50.0 ± 0.40
 julia> a+b
-110.0 ± 5.0990195135927845
+150 ± 1.1
+julia> a*b
+5000 ± 64
 julia> (a*b*Meter)^2
-1.0e6 ± 1.0001999800039988e6 m²
+25000000 ± 640000 m²
 ```
 Future features
 - [ ] LaTex printing in iJulia
 - [ ] Guesses at pretty unit reduction
 - [ ] Maximally accurate fundamental units from CODATA
-- [ ] Round properly when displaying Uncertain numbers
 
 Feel free to start an issue if you have any problems or questions or just want to get in contact with me.

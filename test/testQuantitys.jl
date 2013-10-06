@@ -29,28 +29,28 @@ R = 10*Ohm
 @test Joule - Mega*ElectronVolt < Joule
 
 # change base unit
-const Slug = QUnit("slug")
-QUnit("kg", 0.0685217659*Slug)
+const Slug = BaseUnit("slug")
+DerivedUnit("g", 1e-3*0.0685217659*Slug)
 @test asbase(KiloGram) == 0.0685217659*Slug
 @test as(KiloGram, Slug) == 0.0685217659*Slug
 @test asbase(KiloGram).unit == Slug.unit
 @test KiloGram.unit != Slug.unit
 @test KiloGram.unit != asbase(Slug.unit)
 @test Slug.unit == asbase(Slug.unit)
-QUnit("kg")
-QUnit("slug", 14.5939029*KiloGram)
+BaseUnit("g", prefix=3)
+DerivedUnit("slug", 14.5939029*KiloGram)
 @test asbase(KiloGram) != 0.0685217659*Slug
 @test isapprox(as(KiloGram, Slug), 0.0685217659*Slug)
 @test asbase(KiloGram).unit != Slug.unit
 @test KiloGram.unit != Slug.unit
-@test KiloGram.unit == asbase(Slug.unit)
-@test Slug.unit != asbase(Slug.unit)
+@test KiloGram.unit == asbase(Slug).unit
+@test Slug.unit != asbase(Slug).unit
 
 # long unit chain
-A = QUnit("A")
-B = QUnit("B", 2*A)
-C = QUnit("C", 2*A*B)
-D = QUnit("D", 2*A*B*C)
+A = BaseUnit("A")
+B = DerivedUnit("B", 2*A)
+C = DerivedUnit("C", 2*A*B)
+D = DerivedUnit("D", 2*A*B*C)
 asbase(D)
 as(A*B*C, D)
 
@@ -60,3 +60,7 @@ as(A*B*C, D)
 @test Milli*Newton == 1//1000*Newton
 @test_throws a = Milli*Milli*Meter
 @test (Milli*Meter)*(Mega*Physical.ElectronVolt) == (Kilo*Meter)*Physical.ElectronVolt
+
+# and prefixes with a prefixed base unit
+@test isapprox(Nano*KiloGram, 1e-9*KiloGram)
+@test isapprox(Nano*Gram, 1e-12*KiloGram)

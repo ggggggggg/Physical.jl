@@ -1,6 +1,6 @@
 module PUnits
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
-
+# UnitSymbol was added to support prefixes
 type UnitSymbol
     sym::UTF8String # unit symbol, ie "m"
     pre::Int16      # integer representing power of 10 of prefix, ie 3 represents kilo
@@ -9,6 +9,7 @@ UnitSymbol(sym::String, pre::Int) = UnitSymbol(convert(UTF8String, sym), int16(p
 Base.hash(x::UnitSymbol) = hash("$(x.sym),$(x.pre)") # make UnitSymbol act nice with Dict
 Base.isequal(x::UnitSymbol, y::UnitSymbol) = x.sym==y.sym && x.pre==y.pre
 PrefixSystem = Dict{Int16, UTF8String}()
+reset_prefix_system() = [pop!(PrefixSystem, k) for (k,v) in PrefixSystem]
 type Prefix
     pre::Int16
 end
@@ -16,12 +17,14 @@ function Prefix(sym::String, pre::Int)
     PrefixSystem[int16(pre)] = convert(UTF8String, sym)
     return Prefix(int16(pre))
 end
+# Unit keeps track of unit symbols and powers, it has no idea how a symbol relates to
+# any other symbol
 type Unit
         d::Dict{UnitSymbol, Float64} # dict of exponents for unitsymbols
 end
-function Unit(x::String, y::Int=0)
+function Unit(x::String, prefix::Int=0)
     z = Unit()
-    z.d[UnitSymbol(x,y)] = 1.0
+    z.d[UnitSymbol(x,prefix)] = 1.0
     return z
 end
 Unit() = Unit(Dict{UnitSymbol, Float64}())
@@ -41,6 +44,8 @@ function *(x::Unit, y::Unit)
     z = Unit()
     combined_units = union(keys(x.d), keys(y.d))
     for u in combined_units
+        # round to float32 precision so we dont end up with m^1e-12
+        # going all the way to float32 precision is probably overkill
         new_exponent = float64(float32(defaultget(x.d,u)+defaultget(y.d,u))) # round to float32 precision
         if new_exponent != 0.0
                 z.d[u] = new_exponent
@@ -48,7 +53,7 @@ function *(x::Unit, y::Unit)
     end
     return z
 end
-function ^(x::Unit,y::Integer)
+function ^(x::Unit,y::Integer) # there must be a shorter way to define ^
     z = Unit()
     for (k,v) in x.d
             z.d[k] = v*y
@@ -88,21 +93,9 @@ end
 
 
 # printing Text
-superscript(i) = map(repr(i)) do c
-    c   ==  '-' ? '\u207b' :
-    c   ==  '1' ? '\u00b9' :
-    c   ==  '2' ? '\u00b2' :
-    c   ==  '3' ? '\u00b3' :
-    c   ==  '4' ? '\u2074' :
-    c   ==  '5' ? '\u2075' :
-    c   ==  '6' ? '\u2076' :
-    c   ==  '7' ? '\u2077' :
-    c   ==  '8' ? '\u2078' :
-    c   ==  '9' ? '\u2079' :
-    c   ==  '0' ? '\u2070' :
-    c   ==  '.' ? '\u00b7' :
-    error("Unexpected Chatacter")
-end
+
+superscript(c::Char) = "⁰¹²³⁴⁵⁶⁷⁸⁹·⁻"[[1,4,6,8,10,13,16,19,22,25,28,30][search("0123456789.-", c)]]
+superscript(x::Number) = map(superscript,repr(x))
 prettyround(x::Float64) = x%1 == 0 ? int64(round(x)) : x
 function show(io::IO,x::Unit)
     if isempty(x.d)

@@ -56,20 +56,18 @@ julia> DerivedUnit("m", 3.28084*Foot)
 julia> asbase(Meter)
 3.28084 ft
 ```
-There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself.
+There is also a Type for uncertain numbers, with error propagation. It currently treats the covariance and correlation between numbers as 0.  If you have a good idea of how to implement covariance and correlation, let me know, or do it yourself. It usually chooses a reasonable format given the number of significant digits.  If there is only one significant digit or less it will print out the entire representation of the value and uncertainty.
 ```
 julia> a = Uncertain(100,1)
-100.0 ± 1.0
-julia> b = Uncertain(10,5)
-10.0 ± 5.0
-julia> a*b
-1000.0 ± 500.09999000199946
-julia> a-b
-90.0 ± 5.0990195135927845
+100 ± 1.0
+julia> b = Uncertain(50,0.4)
+50.0 ± 0.40
 julia> a+b
-110.0 ± 5.0990195135927845
+150 ± 1.1
+julia> a*b
+5000 ± 64
 julia> (a*b*Meter)^2
-1.0e6 ± 1.0001999800039988e6 m²
+25000000 ± 640000 m²
 ```
 Future features
 - [ ] LaTex printing in iJulia

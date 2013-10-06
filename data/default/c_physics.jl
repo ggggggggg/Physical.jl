@@ -22,18 +22,18 @@ const alpha_fine_structure = 7.2973525698e-3
 const rydberg_const = alpha_fine_structure^2*m_electron*c_light/(2*h_plank)
 
 
-const ElectronVolt = QUnit("eV", e_electron*Volt)
-const Angstrom = QUnit("Å", 1e-10*Meter)
-const Fermi = QUnit("F", Femto*Meter)
-const Phi0_flux = QUnit("ϕ₀", phi0_flux)
-const H_plank = QUnit("h", h_plank)
-const Hbar_plank = QUnit("ħ", hbar_plank)
-const K_boltzman = QUnit("kᵇ", k_boltzman) # I can't find a unicode subscript b
-const U0_magnetic = QUnit("μ₀", u0_magnetic)
-const E0_electric = QUnit("ε₀", e0_electric)
-const Z0_freespace = QUnit("Z₀", z0_freespace)
-const A_bohr = QUnit("a₀", a_bohr)
-const N_avagadro = QUnit("Nₐ", n_avagadro)
+const ElectronVolt = DerivedUnit("eV", e_electron*Volt)
+const Angstrom = DerivedUnit("Å", 1e-10*Meter)
+const Fermi = DerivedUnit("F", Femto*Meter)
+const Phi0_flux = DerivedUnit("ϕ₀", phi0_flux)
+const H_plank = DerivedUnit("h", h_plank)
+const Hbar_plank = DerivedUnit("ħ", hbar_plank)
+const K_boltzman = DerivedUnit("kᵇ", k_boltzman) # I can't find a unicode subscript b
+const U0_magnetic = DerivedUnit("μ₀", u0_magnetic)
+const E0_electric = DerivedUnit("ε₀", e0_electric)
+const Z0_freespace = DerivedUnit("Z₀", z0_freespace)
+const A_bohr = DerivedUnit("a₀", a_bohr)
+const N_avagadro = DerivedUnit("Nₐ", n_avagadro)
 
 
 export k_boltzman, n_avagadro, h_plank, hbar_plank, g_gravitation, g_earth_gravity, c_light

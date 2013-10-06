@@ -19,13 +19,16 @@ Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 # UnitSytem by example with SI units
 # UnitSystem["J"] = a quantity with other units that is equal to a Joule
 # UnitSystem["m"] does not exist, which marks "m" as a base unit
-UnitSystem = Dict{UTF8String, Quantity}() # I should figure out how to give DefaultUnitSystem a type
+UnitSystem = Dict{UTF8String, Union(Quantity, Int)}() # I should figure out how to give DefaultUnitSystem a type
 reset_unit_system() = [pop!(UnitSystem, k) for (k,v) in UnitSystem]
-function QUnit(x::String, system=UnitSystem) # consider renaming as BaseUnit
-    haskey(system,x) ? delete!(system, x) : 0 # remove from unit system to mark as base unit
-    return Quantity(1,Unit(x))
+function QUnit(x::String; prefix=0) # consider renaming as BaseUnit
+    return Quantity(1,Unit(x,prefix))
 end
-function QUnit(x::String, y::Quantity, system=UnitSystem) # consider renaming DerivedUnit
+function BaseUnit(x::String; prefix=0, latex="", system=UnitSystem) # consider renaming as BaseUnit
+    system[x] = prefix # remove from unit system to mark as base unit
+    return Quantity(1,Unit(x,prefix))
+end
+function DerivedUnit(x::String, y::Quantity; latex="", system=UnitSystem) # consider renaming DerivedUnit
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))
@@ -34,10 +37,11 @@ function asbase(x::Quantity, system=UnitSystem)
     prefactor, prefixless_unit = remove_prefix(x.unit)
     out=prefactor*x.value
     for (unitsymbol,n) in prefixless_unit.d
-        if haskey(system,unitsymbol.sym)
-            out *= asbase(system[unitsymbol.sym], system)^n
-        else # if it doesn't have they key, then symbol is a base unit
-            out *= QUnit(unitsymbol.sym)^n
+        next = system[unitsymbol.sym]
+        if typeof(next)<:Quantity
+            out *= asbase(next, system)^n
+        else # if next is not a Quantity, next is the prefix of a base unit
+            out *= (10^-float64(next))*QUnit(unitsymbol.sym, prefix=next)^n
         end
     end
     return out
@@ -45,8 +49,9 @@ end
 function asbase(x::Unit, system=UnitSystem)
     out=Unitless
     for (unitsymbol,n) in x.d
-        if haskey(system,unitsymbol.sym)
-            out *= asbase(system[unitsymbol.sym].unit, system)^n
+        next = system[unitsymbol.sym]
+        if typeof(next)<:Quantity
+            out *= asbase(next.unit, system)^n
         else # if it doesn't have they key, then symbol is a base unit
             out *= Unit(unitsymbol.sym)^n
         end
@@ -105,7 +110,7 @@ function show{T}(io::IO, x::Quantity{T})
     show(io, x.unit)
 end
 
-export QUnit, Prefix, asbase, as, Uncertain
+export BaseUnit, DerivedUnit, Prefix, asbase, as, Uncertain
 
 end #end module
 

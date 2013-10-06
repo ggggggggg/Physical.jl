@@ -22,9 +22,9 @@ end
 type Unit
         d::Dict{UnitSymbol, Float64} # dict of exponents for unitsymbols
 end
-function Unit(x::String, y::Int=0)
+function Unit(x::String, prefix::Int=0)
     z = Unit()
-    z.d[UnitSymbol(x,y)] = 1.0
+    z.d[UnitSymbol(x,prefix)] = 1.0
     return z
 end
 Unit() = Unit(Dict{UnitSymbol, Float64}())

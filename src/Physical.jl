@@ -1,7 +1,7 @@
 include("Quantitys.jl")
 module Physical
 using Quantitys
-export as, asbase, QUnit, Prefix
+export as, asbase, BaseUnit, DerivedUnit, Prefix
 export Uncertain
 
 # looks in Physical/data and loads files in alpabetical order

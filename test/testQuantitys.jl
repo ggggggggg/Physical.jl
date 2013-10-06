@@ -28,29 +28,12 @@ R = 10*Ohm
 @test (ElectronVolt+Joule).unit != (Joule+ElectronVolt).unit
 @test Joule - Mega*ElectronVolt < Joule
 
-# change base unit
-const Slug = QUnit("slug")
-QUnit("kg", 0.0685217659*Slug)
-@test asbase(KiloGram) == 0.0685217659*Slug
-@test as(KiloGram, Slug) == 0.0685217659*Slug
-@test asbase(KiloGram).unit == Slug.unit
-@test KiloGram.unit != Slug.unit
-@test KiloGram.unit != asbase(Slug.unit)
-@test Slug.unit == asbase(Slug.unit)
-QUnit("kg")
-QUnit("slug", 14.5939029*KiloGram)
-@test asbase(KiloGram) != 0.0685217659*Slug
-@test isapprox(as(KiloGram, Slug), 0.0685217659*Slug)
-@test asbase(KiloGram).unit != Slug.unit
-@test KiloGram.unit != Slug.unit
-@test KiloGram.unit == asbase(Slug.unit)
-@test Slug.unit != asbase(Slug.unit)
 
 # long unit chain
-A = QUnit("A")
-B = QUnit("B", 2*A)
-C = QUnit("C", 2*A*B)
-D = QUnit("D", 2*A*B*C)
+A = BaseUnit("A")
+B = DerivedUnit("B", 2*A)
+C = DerivedUnit("C", 2*A*B)
+D = DerivedUnit("D", 2*A*B*C)
 asbase(D)
 as(A*B*C, D)
 

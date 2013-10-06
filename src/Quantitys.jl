@@ -25,7 +25,7 @@ function QUnit(x::String; prefix=0) # consider renaming as BaseUnit
     return Quantity(1,Unit(x,prefix))
 end
 function BaseUnit(x::String; prefix=0, latex="", system=UnitSystem) # consider renaming as BaseUnit
-    system[x] = prefix # remove from unit system to mark as base unit
+    system[x] = prefix # base units have their prefix as the dict value
     return Quantity(1,Unit(x,prefix))
 end
 function DerivedUnit(x::String, y::Quantity; latex="", system=UnitSystem) # consider renaming DerivedUnit

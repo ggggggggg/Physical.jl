@@ -28,6 +28,23 @@ R = 10*Ohm
 @test (ElectronVolt+Joule).unit != (Joule+ElectronVolt).unit
 @test Joule - Mega*ElectronVolt < Joule
 
+# change base unit
+const Slug = BaseUnit("slug")
+DerivedUnit("g", 1e-3*0.0685217659*Slug)
+@test asbase(KiloGram) == 0.0685217659*Slug
+@test as(KiloGram, Slug) == 0.0685217659*Slug
+@test asbase(KiloGram).unit == Slug.unit
+@test KiloGram.unit != Slug.unit
+@test KiloGram.unit != asbase(Slug.unit)
+@test Slug.unit == asbase(Slug.unit)
+BaseUnit("g", prefix=3)
+DerivedUnit("slug", 14.5939029*KiloGram)
+@test asbase(KiloGram) != 0.0685217659*Slug
+@test isapprox(as(KiloGram, Slug), 0.0685217659*Slug)
+@test asbase(KiloGram).unit != Slug.unit
+@test KiloGram.unit != Slug.unit
+@test KiloGram.unit == asbase(Slug).unit
+@test Slug.unit != asbase(Slug).unit
 
 # long unit chain
 A = BaseUnit("A")

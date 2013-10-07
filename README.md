@@ -42,8 +42,8 @@ julia> R*17*Ampere/(14*Volt)
 ```
 Create new units with ```DerivedUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
 ```
-julia> Foot = QUnit("ft", 0.3048*Meter)
-julia> Pound = QUnit("lb", 4.44822162*Newton)
+julia> Foot = DerivedUnit("ft", 0.3048*Meter)
+julia> Pound = DerivedUnit("lb", 4.44822162*Newton)
 julia> asbase(12*Foot*Pound)
 16.269815397312 m²kg s⁻²
 julia> as(12*Foot*Pound, Newton*Meter)

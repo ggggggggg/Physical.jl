@@ -9,7 +9,7 @@ typealias QValue  Union(Number, AbstractArray, Uncertain) # things that go insid
 # Quantity is where most of the action happens
 # Quantity combines a value with some units
 # Quantitys can be reduced to base units via asbase, which uses the UnitSytem Dict
-# all other conversions are based on asbase
+# all other conversions are call on asbase
 type Quantity{T<:QValue}
     value::T
     unit::Unit
@@ -18,17 +18,17 @@ Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # retu
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 # UnitSytem by example with SI units
 # UnitSystem["J"] = a quantity with other units that is equal to a Joule
-# UnitSystem["m"] does not exist, which marks "m" as a base unit
+# UnitSystem["m"] = 0 which markes it as a non-prefixed base unit
 UnitSystem = Dict{UTF8String, Union(Quantity, Int)}() # I should figure out how to give DefaultUnitSystem a type
 reset_unit_system() = [pop!(UnitSystem, k) for (k,v) in UnitSystem]
-function QUnit(x::String; prefix=0) # consider renaming as BaseUnit
+function QUnit(x::String; prefix=0)
     return Quantity(1,Unit(x,prefix))
 end
-function BaseUnit(x::String; prefix=0, latex="", system=UnitSystem) # consider renaming as BaseUnit
+function BaseUnit(x::String; prefix=0, latex="", system=UnitSystem)
     system[x] = prefix # base units have their prefix as the dict value
     return Quantity(1,Unit(x,prefix))
 end
-function DerivedUnit(x::String, y::Quantity; latex="", system=UnitSystem) # consider renaming DerivedUnit
+function DerivedUnit(x::String, y::Quantity; latex="", system=UnitSystem)
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))

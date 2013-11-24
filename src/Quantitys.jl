@@ -95,7 +95,7 @@ for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :is
                     a.unit == b.unit && ($f)(a.value,b.value)
                 end end
 end
-sqrt(x::Quantity) = Quantity_(sqrt(x.value), x.unit)
+sqrt(x::Quantity) = Quantity_(sqrt(x.value), x.unit^.5)
 getindex(x::Quantity, y...) = Quantity_(getindex(x.value, y...),x.unit)
 setindex!(x::Quantity, y::Quantity, z...) = setindex!(x.value, as(y,x).value, z...)
 setindex!(x::Quantity, y, z...) = error("x[z]=y reqires same units, x.unit=$(x.unit), y has no units. use x[z] = y*same_units or x.value[z] = y instead")

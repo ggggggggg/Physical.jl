@@ -50,7 +50,7 @@ julia> asbase(12*Foot*Pound)
 16.269815397312 m²kg s⁻²
 julia> as(12*Foot*Pound, Newton*Meter)
 16.269815397312 m N 
-julia> as(12*Foot*Pound, 7000*Newton*Meter) # note the value of the second argument doesn't matter
+julia> as(12*Foot*Pound, 7000*Newton*Meter) # note only the units of the second argument matter
 16.269815397312 m N 
 ```
 ```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantitys.jl``` if you want to replace a prefixed base unit like kg. ``.julia/Physical/data``.  If you add a ``.jl`` file to the ``data/default`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded. Also you can define a totally different unit system in without messing with ```default```, take a look at ```data/what_to_load.jl```.

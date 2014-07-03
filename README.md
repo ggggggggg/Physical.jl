@@ -1,6 +1,5 @@
 ```Physical``` provides simple support for arbitrary unit systems in Julia, as well a nice set of predefined units and constants. The keys are the types `Quantity` and `Unit`, but you should just use predefined unit constants for the most part. Since `Physical` is not yet an official package, install with `Pkg.clone("https://github.com/ggggggggg/Physical.jl.git")`.
 
-You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance, whereas ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*complicated_performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
 
 ```
 julia> using Physical
@@ -75,6 +74,9 @@ julia> a*b
 julia> (a*b*Meter)^2
 25000000 ± 640000 m²
 ```
+
+You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance, whereas ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*complicated_performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
+
 Potential future features
 - [ ] LaTex printing in iJulia
 - [ ] Guesses at pretty unit reduction

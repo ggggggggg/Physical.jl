@@ -75,7 +75,7 @@ julia> a*b
 julia> (a*b*Meter)^2
 25000000 ± 640000 m²
 ```
-Future features
+Potential future features
 - [ ] LaTex printing in iJulia
 - [ ] Guesses at pretty unit reduction
 - [ ] Maximally accurate fundamental units from CODATA

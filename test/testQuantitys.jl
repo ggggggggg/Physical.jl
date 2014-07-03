@@ -11,8 +11,8 @@ import Physical.Quantitys.PUnits.UnitSymbol
 @test isapprox((am^3.0*bu), a^3.0*b*(Meter^3.0*Newton))
 @test UnitSymbol("m",0) == UnitSymbol("m",0)
 a = rand(5)*Newton
-@test_throws a[1] = 1
-@test_throws a[1] = 1*Meter
+@test_throws ErrorException a[1] = 1
+@test_throws ErrorException a[1] = 1*Meter
 a[1] = 1*Newton
 @test a[1] ==  1*Newton
 @test a[1] == 1*Kilogram*Meter*Second^-2
@@ -24,7 +24,7 @@ R = 10*Ohm
 @test Second*(1/Second) == 1
 @test Meter*(1/Meter) == 1
 @test Meter*([1,2,3]./Meter) == [1,2,3]
-@test ElectronVolt + Joule == Joule + ElectronVolt
+@test isapprox(ElectronVolt + Joule, Joule + ElectronVolt)
 @test (ElectronVolt+Joule).unit != (Joule+ElectronVolt).unit
 @test Joule - Mega*ElectronVolt < Joule
 
@@ -58,7 +58,10 @@ as(A*B*C, D)
 
 @test Milli*Meter == 1//1000*Meter
 @test Milli*Newton == 1//1000*Newton
-@test_throws a = Milli*Milli*Meter
+@test isapprox((Milli*Newton)/Newton, 1//1000)
+@test isapprox((Milli*Newton)*(1/Newton), 1//1000)
+@test sqrt(Meter^2) == Meter
+@test_throws MethodError a = Milli*Milli*Meter
 @test (Milli*Meter)*(Mega*Physical.ElectronVolt) == (Kilo*Meter)*Physical.ElectronVolt
 
 # and prefixes with a prefixed base unit

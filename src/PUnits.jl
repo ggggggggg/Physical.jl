@@ -34,9 +34,10 @@ function remove_prefix(x::Unit)
     z = Unit()
     total_power = 0
     for (unitsymbol, exponent) in x.d
-        z.d[UnitSymbol(unitsymbol.sym,0)] = exponent
+        z.d[UnitSymbol(unitsymbol.sym,0)] = exponent + defaultget(z.d, UnitSymbol(unitsymbol.sym,0))
         total_power += unitsymbol.pre*exponent
     end
+    filter!((k,v)->v!=0,z.d)
     return 10^total_power, z # prefactor, unit without prefix
 end
 defaultget(x::Dict, key::UnitSymbol) = haskey(x, key) ? x[key] : float64(0)
@@ -62,7 +63,7 @@ function ^(x::Unit,y::Integer) # there must be a shorter way to define ^
 end
 function ^(x::Unit,y::Rational)
     z = Unit()
-    for (k,v) in x.d
+    for (k,v) in x.dNao
             z.d[k] = v*y
     end
     return z

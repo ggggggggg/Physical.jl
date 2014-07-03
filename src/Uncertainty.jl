@@ -28,6 +28,7 @@ quadsum_neg(x::Number...) = sqrt(sum(sign([x...]).*([x...].^2)))
 /(x::Uncertain, y::Number) = x/Uncertain(y)
 /(x::Number, y::Uncertain) = Uncertain(x)/y
 log(x::Uncertain) = (v = log(x.v); Uncertain_(v, x.u/x.v))
+log(::MathConst{:e},x::Uncertain) = log(x)
 log(base::Number, x::Uncertain) = (v = log(base,x.v); Uncertain_(v, x.u/(x.v*log(base))))
 log10(x::Uncertain) = log(10, x)
 ^(x::Uncertain, y::Uncertain) = error("x^y with both ::Uncertain not implemented, don't know formula")

@@ -66,17 +66,32 @@ function as(from::Quantity, to::Quantity, system=UnitSystem) # warning, ignores 
 end
 # this is purposfully the only way to use a Prefix
 *(x::Prefix, y::Quantity) = length(y.unit.d) == 1 ? Quantity(y.value, x*y.unit) : error("Prefix*Quantity only defined for Quantities with only one unit")
-
-*{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value*y.value, x.unit*y.unit)
+function *{T,S}(x::Quantity{T}, y::Quantity{S})
+    xp,xu = remove_prefix(x.unit)
+    yp,yu = remove_prefix(y.unit)
+    Quantity_(xp*yp*x.value*y.value, xu*yu)
+end
 *(x::Quantity, y::QValue) = Quantity_(x.value*y, x.unit)
 *(x::QValue, y::Quantity) = y*x
-.*{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value.*y.value, x.unit*y.unit)
+function .*{T,S}(x::Quantity{T}, y::Quantity{S})
+    xp,xu = remove_prefix(x.unit)
+    yp,yu = remove_prefix(y.unit)
+    Quantity_(xp*yp*(x.value.*y.value), xu*yu)
+end
 .*(x::Quantity, y::QValue) = Quantity_(x.value.*y, x.unit)
 .*(x::QValue, y::Quantity) = y.*x
-/{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value/y.value, x.unit/y.unit)
+function /{T,S}(x::Quantity{T}, y::Quantity{S})
+    xp,xu = remove_prefix(x.unit)
+    yp,yu = remove_prefix(y.unit)
+    Quantity_((xp/yp)*(x.value/y.value), xu/yu)
+end
 /(x::Quantity, y::QValue) = Quantity_(x.value/y, x.unit)
 /(x::QValue, y::Quantity) = Quantity_(x/y.value, y.unit^-1)
-./{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value./y.value, x.unit./y.unit)
+function ./{T,S}(x::Quantity{T}, y::Quantity{S})
+    xp,xu = remove_prefix(x.unit)
+    yp,yu = remove_prefix(y.unit)
+    Quantity_((xp/yp)*(x.value./y.value), xu/yu)
+end
 ./(x::Quantity, y::QValue) = Quantity_(x.value./y, x.unit)
 ./(x::QValue, y::Quantity) = Quantity_(x/y.value, y.unit^-1)
 +{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value + as(y,x).value, x.unit)

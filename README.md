@@ -75,7 +75,7 @@ julia> (a*b*Meter)^2
 25000000 ± 640000 m²
 ```
 
-You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance, whereas ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*complicated_performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
+You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance and pretty much just does SI base units. ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
 
 Potential future features
 - [ ] LaTex printing in iJulia

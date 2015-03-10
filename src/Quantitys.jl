@@ -107,7 +107,8 @@ for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :is
     @eval begin function ($f)(x::Quantity, y::Quantity)
                     a = asbase(x)
                     b = asbase(y)
-                    a.unit == b.unit && ($f)(a.value,b.value)
+                    assert(a.unit == b.unit)
+                    ($f)(a.value,b.value)
                 end end
 end
 sqrt(x::Quantity) = Quantity_(sqrt(x.value), x.unit^.5)

@@ -43,14 +43,16 @@ julia> R*17*Ampere/(14*Volt)
 ```
 Create new units with ```DerivedUnit```, unit symbols can be unicode, like that `Ω` above. Convert units to base units and other units using ```asbase``` and ```as```.  Warning, when you use ```as(from,to)``` it uses the unit of `to` but ignores the value of `to`.
 ```
-julia> Foot = QUnit("ft", 0.3048*Meter)
-julia> Pound = QUnit("lb", 4.44822162*Newton)
-julia> asbase(12*Foot*Pound)
-16.269815397312 m²kg s⁻²
-julia> as(12*Foot*Pound, Newton*Meter)
-16.269815397312 m N 
-julia> as(12*Foot*Pound, 7000*Newton*Meter) # note only the units of the second argument matter
-16.269815397312 m N 
+julia> Foot = DerivedUnit("ft",0.3048*Meter)
+1 ft 
+julia> l=22*Foot+3*Meter
+31.84251968503937 ft 
+julia> l*Volt
+31.84251968503937 ft V 
+julia> asbase(l)
+9.7056 m 
+julia> as(l,Angstrom)
+9.7056e10 Å 
 ```
 ```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantitys.jl``` if you want to replace a prefixed base unit like kg. If you add a ``.jl`` file to the ``data/default`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded. Also you can define a totally different unit system in without messing with ```default```, take a look at ```data/what_to_load.jl```.
 ```

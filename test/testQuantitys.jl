@@ -70,3 +70,6 @@ as(A*B*C, D)
 @test isapprox(Nano*Gram, 1e-12*KiloGram)
 @test Gram*Gram==1e-6*KiloGram^2
 @test isapprox(as(Joule*Joule/asbase(ElectronVolt), ElectronVolt)/ElectronVolt, (Joule/ElectronVolt)^2 )
+
+# other functions
+@test round(5.13891283*Meter,3)==5.139*Meter

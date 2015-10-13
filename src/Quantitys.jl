@@ -131,6 +131,7 @@ size(x::Quantity) = size(x.value)
 ndims(x::Quantity) = ndims(x.value)
 endof(x::Quantity) = endof(x.value)
 length(x::Quantity) = length(x.value)
+Base.round(x::Quantity, y) = Quantity(round(x.value,y), x.unit)
 
 function show{T}(io::IO, x::Quantity{T})
     show(io, x.value)

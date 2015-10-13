@@ -5,7 +5,7 @@ type UnitSymbol
     sym::UTF8String # unit symbol, ie "m"
     pre::Int16      # integer representing power of 10 of prefix, ie 3 represents kilo
 end
-UnitSymbol(sym::String, pre::Int) = UnitSymbol(convert(UTF8String, sym), int16(pre))
+UnitSymbol(sym::AbstractString, pre::Int) = UnitSymbol(convert(UTF8String, sym), Int16(pre))
 Base.hash(x::UnitSymbol) = hash("$(x.sym),$(x.pre)") # make UnitSymbol act nice with Dict
 Base.isequal(x::UnitSymbol, y::UnitSymbol) = x.sym==y.sym && x.pre==y.pre
 PrefixSystem = Dict{Int16, UTF8String}()
@@ -13,16 +13,16 @@ reset_prefix_system() = [pop!(PrefixSystem, k) for (k,v) in PrefixSystem]
 type Prefix
     pre::Int16
 end
-function Prefix(sym::String, pre::Int)
-    PrefixSystem[int16(pre)] = convert(UTF8String, sym)
-    return Prefix(int16(pre))
+function Prefix(sym::AbstractString, pre::Int)
+    PrefixSystem[Int16(pre)] = convert(UTF8String, sym)
+    return Prefix(Int16(pre))
 end
 # Unit keeps track of unit symbols and powers, it has no idea how a symbol relates to
 # any other symbol
 type Unit
         d::Dict{UnitSymbol, Float64} # dict of exponents for unitsymbols
 end
-function Unit(x::String, prefix::Int=0)
+function Unit(x::AbstractString, prefix::Int=0)
     z = Unit()
     z.d[UnitSymbol(x,prefix)] = 1.0
     return z
@@ -40,14 +40,14 @@ function remove_prefix(x::Unit)
     filter!((k,v)->v!=0,z.d)
     return 10^total_power, z # prefactor, unit without prefix
 end
-defaultget(x::Dict, key::UnitSymbol) = haskey(x, key) ? x[key] : float64(0)
+defaultget(x::Dict, key::UnitSymbol) = haskey(x, key) ? x[key] : Float64(0)
 function *(x::Unit, y::Unit)
     z = Unit()
     combined_units = union(keys(x.d), keys(y.d))
     for u in combined_units
-        # round to float32 precision so we dont end up with m^1e-12
-        # going all the way to float32 precision is probably overkill
-        new_exponent = float64(float32(defaultget(x.d,u)+defaultget(y.d,u))) # round to float32 precision
+        # round to Float32 precision so we dont end up with m^1e-12
+        # going all the way to Float32 precision is probably overkill
+        new_exponent = Float64(Float32(defaultget(x.d,u)+defaultget(y.d,u))) # round to Float32 precision
         if new_exponent != 0.0
                 z.d[u] = new_exponent
         end
@@ -87,7 +87,7 @@ function *(x::Prefix, y::Unit)
     for (unitsymbol, exponent) in y.d
         exponent != 1 ? error("Prefix*Unit only allowed for single units with exponent==1, y=$(y), exponent=$exponent") : 0
         z = Unit()
-        z.d[UnitSymbol(unitsymbol.sym, unitsymbol.pre+x.pre)] = float64(1)
+        z.d[UnitSymbol(unitsymbol.sym, unitsymbol.pre+x.pre)] = Float64(1)
         return z
     end
 end
@@ -97,7 +97,7 @@ end
 
 superscript(c::Char) = "⁰¹²³⁴⁵⁶⁷⁸⁹·⁻"[[1,4,6,8,10,13,16,19,22,25,28,30][search("0123456789.-", c)]]
 superscript(x::Number) = map(superscript,repr(x))
-prettyround(x::Float64) = x%1 == 0 ? int64(round(x)) : x
+prettyround(x::Float64) = x%1 == 0 ? Int64(round(x)) : x
 function show(io::IO,x::Unit)
     if isempty(x.d)
         print(io, "Unitless")

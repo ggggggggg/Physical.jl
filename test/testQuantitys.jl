@@ -62,9 +62,11 @@ as(A*B*C, D)
 @test sqrt(Meter^2) == Meter
 @test_throws MethodError a = Milli*Milli*Meter
 @test (Milli*Meter)*(Mega*Physical.ElectronVolt) == (Kilo*Meter)*Physical.ElectronVolt
-@test_throws ErrorException 1*ElectronVolt>2*Meter
+@test_throws AssertionError 1*ElectronVolt>2*Meter
 @test ElectronVolt<Joule
 
 # and prefixes with a prefixed base unit
 @test isapprox(Nano*KiloGram, 1e-9*KiloGram)
 @test isapprox(Nano*Gram, 1e-12*KiloGram)
+@test Gram*Gram==1e-6*KiloGram^2
+@test isapprox(as(Joule*Joule/asbase(ElectronVolt), ElectronVolt)/ElectronVolt, (Joule/ElectronVolt)^2 )

@@ -3,9 +3,10 @@ include("Uncertainty.jl")
 module Quantitys
 using PUnits, Uncertainty
 # adding methods to:
-import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox
+import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox,
+<, >, >=, <=, .!=, .==, .<, .>, .>=, .<=
 
-typealias QValue  Union(Number, AbstractArray, Uncertain) # things that go inside a Quantity
+typealias QValue  Union{Number, AbstractArray, Uncertain} # things that go inside a Quantity
 # Quantity is where most of the action happens
 # Quantity combines a value with some units
 # Quantitys can be reduced to base units via asbase, which uses the UnitSytem Dict
@@ -14,46 +15,57 @@ type Quantity{T<:QValue}
     value::T
     unit::Unit
 end
-Quantity_(x::QValue, y::Unit) = asbase(y) == Unitless ? x : Quantity(x,y) # return a normal julia object when unitless
+function Quantity_(x::QValue, y::Unit)
+    if asbase(y) == Unitless
+        return asbase(Quantity(x,y))
+    end
+    Quantity(x,y)
+end
 Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 # UnitSytem by example with SI units
 # UnitSystem["J"] = a quantity with other units that is equal to a Joule
 # UnitSystem["m"] = 0 which markes it as a non-prefixed base unit
-UnitSystem = Dict{UTF8String, Union(Quantity, Int)}() # I should figure out how to give DefaultUnitSystem a type
+UnitSystem = Dict{UTF8String, Union{Quantity, Int}}() # I should figure out how to give DefaultUnitSystem a type
 reset_unit_system() = [pop!(UnitSystem, k) for (k,v) in UnitSystem]
-function QUnit(x::String; prefix=0)
+function QUnit(x::AbstractString; prefix=0)
     return Quantity(1,Unit(x,prefix))
 end
-function BaseUnit(x::String; prefix=0, latex="", system=UnitSystem)
+function BaseUnit(x::AbstractString; prefix=0, latex="", system=UnitSystem)
     system[x] = prefix # base units have their prefix as the dict value
     return Quantity(1,Unit(x,prefix))
 end
-function DerivedUnit(x::String, y::Quantity; latex="", system=UnitSystem)
+function DerivedUnit(x::AbstractString, y::Quantity; latex="", system=UnitSystem)
     x=convert(UTF8String, x)
     system[x] = y
     return Quantity(1,Unit(x))
 end
 function asbase(x::Quantity, system=UnitSystem)
+    x, x.unit
     prefactor, prefixless_unit = remove_prefix(x.unit)
     out=prefactor*x.value
     for (unitsymbol,n) in prefixless_unit.d
         next = system[unitsymbol.sym]
-        if typeof(next)<:Quantity
+        if isa(next,Quantity)
             out *= asbase(next, system)^n
-        else # if next is not a Quantity, next is the prefix of a base unit
-            out *= (10^-float64(next))*QUnit(unitsymbol.sym, prefix=next)^n
+        elseif isa(next,Int) # next is the prefix of a base unit
+            out *= (10.^-(next*n))*QUnit(unitsymbol.sym, prefix=next)^n
+        else
+            throw(ValueError())
         end
     end
     return out
 end
+
 function asbase(x::Unit, system=UnitSystem)
     out=Unitless
     for (unitsymbol,n) in x.d
         next = system[unitsymbol.sym]
-        if typeof(next)<:Quantity
-            out *= asbase(next.unit, system)^n
-        else # if it doesn't have they key, then symbol is a base unit
-            out *= Unit(unitsymbol.sym)^n
+        if isa(next,Quantity)
+            out *=  asbase(next.unit, system)^n
+        elseif isa(next,Int) # next is the prefix of a base unit
+            out *= Unit(unitsymbol.sym,next)^n
+        else
+            throw(ValueError())
         end
     end
     return out
@@ -97,12 +109,12 @@ end
 +{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value + as(y,x).value, x.unit)
 -{T,S}(x::Quantity{T}, y::Quantity{S}) = Quantity_(x.value - as(y,x).value, x.unit)
 -{T}(x::Quantity{T}) = Quantity_(-x.value, x.unit)
-^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^convert(FloatingPoint,y), x.unit^convert(FloatingPoint,y))
-^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^convert(FloatingPoint,y), x.unit^convert(FloatingPoint,y))
-^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value^convert(FloatingPoint,y), x.unit^convert(FloatingPoint,y))
-.^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
-.^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
-.^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(FloatingPoint,y), x.unit.^convert(FloatingPoint,y))
+^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value^convert(AbstractFloat,y), x.unit^convert(AbstractFloat,y))
+^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value^convert(AbstractFloat,y), x.unit^convert(AbstractFloat,y))
+^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value^convert(AbstractFloat,y), x.unit^convert(AbstractFloat,y))
+.^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
+.^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
+.^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
 for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
     @eval begin function ($f)(x::Quantity, y::Quantity)
                     a = asbase(x)
@@ -129,9 +141,3 @@ end
 export BaseUnit, DerivedUnit, Prefix, asbase, as, Uncertain
 
 end #end module
-
-
-
-
-
-

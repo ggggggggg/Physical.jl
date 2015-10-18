@@ -26,7 +26,7 @@ const alpha_fine_structure = 7.2973525698e-3
 
 const Franklin = StatCoulomb
 
-const Ohm = DerivedUnit("\u03a9", Volt/Ampere)
+const Ohm = DerivedUnit("Ω", Volt/Ampere)
 
 
 

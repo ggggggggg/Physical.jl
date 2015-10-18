@@ -1,2 +1,2 @@
 include("testUncertain.jl")
-include("testQuantitys.jl")
+include("testQuantities.jl")

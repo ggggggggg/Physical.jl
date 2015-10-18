@@ -5,7 +5,7 @@
 
 ```
 julia> using Physical
-julia> f = 1*ElectronVolt/H_plank # H_plank is in units of h, so resulting expression have units with h
+julia> f = 1*ElectronVolt/H_planck # H_planck is in units of h, so resulting expression have units with h
 1.0 eV h⁻¹
 julia> asbase(f)
 2.4270444990211597e14 s⁻¹ # all Quantities can be reduced to base units
@@ -56,7 +56,7 @@ julia> asbase(l)
 julia> as(l,Angstrom)
 9.7056e10 Å 
 ```
-```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantitys.jl``` if you want to replace a prefixed base unit like kg. If you add a ``.jl`` file to the ``data/default`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded. Also you can define a totally different unit system in without messing with ```default```, take a look at ```data/what_to_load.jl```.
+```BaseUnit(x::String)``` creates a new base unit. If you just want to add to the existing base units, feel free to use ```BaseUnit```.  If you want to change the base units, on the fly you can. Look at ```testQuantities.jl``` if you want to replace a prefixed base unit like kg. If you add a ``.jl`` file to the ``data/default`` folder it will be loaded in a fixed order automatically by ``Physical``.  This allows you to add or replace units and constants easily. For debugging purposes, ``Physical.loaded_files`` contains the file names in the order they were loaded. Also you can define a totally different unit system in without messing with ```default```, take a look at ```data/what_to_load.jl```.
 ```
 julia> Foot = BaseUnit("ft")
 1 ft 
@@ -82,7 +82,7 @@ julia> (a*b*Meter)^2
 You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance and pretty much just does SI base units. ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
 
 Potential future features
-- [ ] LaTex printing in iJulia
+- [ ] LaTeX printing in iJulia
 - [ ] Guesses at pretty unit reduction
 - [ ] Maximally accurate fundamental units from CODATA
 

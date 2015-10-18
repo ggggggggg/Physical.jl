@@ -1,6 +1,6 @@
 include("PUnits.jl")
 include("Uncertainty.jl")
-module Quantitys
+module Quantities
 using PUnits, Uncertainty
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox,
@@ -9,7 +9,7 @@ import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, g
 typealias QValue  Union{Number, AbstractArray, Uncertain} # things that go inside a Quantity
 # Quantity is where most of the action happens
 # Quantity combines a value with some units
-# Quantitys can be reduced to base units via asbase, which uses the UnitSytem Dict
+# Quantities can be reduced to base units via asbase, which uses the UnitSytem Dict
 # all other conversions are call on asbase
 type Quantity{T<:QValue}
     value::T
@@ -126,7 +126,7 @@ end
 sqrt(x::Quantity) = Quantity_(sqrt(x.value), x.unit^.5)
 getindex(x::Quantity, y...) = Quantity_(getindex(x.value, y...),x.unit)
 setindex!(x::Quantity, y::Quantity, z...) = setindex!(x.value, as(y,x).value, z...)
-setindex!(x::Quantity, y, z...) = error("x[z]=y reqires same units, x.unit=$(x.unit), y has no units. use x[z] = y*same_units or x.value[z] = y instead")
+setindex!(x::Quantity, y, z...) = error("x[z]=y requires same units, x.unit=$(x.unit), y has no units. use x[z] = y*same_units or x.value[z] = y instead")
 size(x::Quantity) = size(x.value)
 ndims(x::Quantity) = ndims(x.value)
 endof(x::Quantity) = endof(x.value)

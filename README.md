@@ -5,7 +5,7 @@
 
 ```
 julia> using Physical
-julia> f = 1*ElectronVolt/H_plank # H_plank is in units of h, so resulting expression have units with h
+julia> f = 1*ElectronVolt/H_planck # H_planck is in units of h, so resulting expression have units with h
 1.0 eV h⁻¹
 julia> asbase(f)
 2.4270444990211597e14 s⁻¹ # all Quantities can be reduced to base units
@@ -82,7 +82,7 @@ julia> (a*b*Meter)^2
 You can also check out ```SIUnits.jl``` which is similar.  The main difference is that ```SIUnits``` uses the type system and multiple dispatch to have high performance and pretty much just does SI base units. ```Physical``` uses dictionaries to allow for arbitrary units like `eV` instead of a combination of a large prefactor and many other base units.  As a result ```Physical``` is not reccomended for high performance.  You can do something like ```y=eV*Meter*performance_sensitive_function(x/(eV*Meter))``` such that performance sensitive parts of your code don't interact with ```Physical``` at all.
 
 Potential future features
-- [ ] LaTex printing in iJulia
+- [ ] LaTeX printing in iJulia
 - [ ] Guesses at pretty unit reduction
 - [ ] Maximally accurate fundamental units from CODATA
 

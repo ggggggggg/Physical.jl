@@ -1,4 +1,4 @@
-# define imerial units - from http://en.wikipedia.org/w/index.php?title=Imperial_units&oldid=574336154
+# define imperial units - from http://en.wikipedia.org/w/index.php?title=Imperial_units&oldid=574336154
 # Length
 const Inch = DerivedUnit("in", 254//10000*Meter)
 const Foot = DerivedUnit("ft", 12*Inch)

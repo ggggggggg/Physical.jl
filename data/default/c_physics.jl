@@ -24,6 +24,7 @@ const r_rydberg = 10973731.568539/Meter
 
 const ElectronVolt = DerivedUnit("eV", e_electron*Volt)
 const Angstrom = DerivedUnit("Å", 1e-10*Meter)
+const Ångström = Angstrom # Alias for Swedish-speaking people
 const Fermi = DerivedUnit("F", Femto*Meter)
 const Phi0_flux = DerivedUnit("ϕ₀", phi0_flux)
 const H_planck = DerivedUnit("h", h_planck)
@@ -41,5 +42,5 @@ export e_electron, m_electron, m_proton, a_bohr, u0_magnetic, e0_electric, z0_fr
 export k_coulomb, mu_bohr, conductance_quantum, k_josephson, phi0_flux, u_nuclear, alpha_fine_structure
 export r_rydberg
 
-export ElectronVolt, Phi0_flux, Angstrom, Fermi, Phi0_flux, H_planck, Hbar_planck, K_boltzmann
+export ElectronVolt, Phi0_flux, Angstrom, Ångström, Fermi, Phi0_flux, H_planck, Hbar_planck, K_boltzmann
 export U0_magnetic, E0_electric, Z0_freespace, A_bohr, N_avogadro

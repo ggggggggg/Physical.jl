@@ -1,14 +1,14 @@
-include("Quantitys.jl")
+include("Quantities.jl")
 module Physical
-using Quantitys
+using Quantities
 export as, asbase, BaseUnit, DerivedUnit, Prefix
 export Uncertain
 
 # looks in Physical/data and loads files in alpabetical order
 # stores load order in Physica.loaded_files for debugging
 function load_unit_system(loaddir::AbstractString)
-	Quantitys.reset_unit_system()
-	Quantitys.PUnits.reset_prefix_system()
+	Quantities.reset_unit_system()
+	Quantities.PUnits.reset_prefix_system()
 	datapath = normpath(dirname(Base.source_path()), "../data/$(loaddir)")
 	global loaded_files = sort(readdir(datapath))
 	for filename in loaded_files

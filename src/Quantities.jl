@@ -1,6 +1,6 @@
 include("PUnits.jl")
 include("Uncertainty.jl")
-module Quantitys
+module Quantities
 using PUnits, Uncertainty
 # adding methods to:
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, getindex, setindex!, size, ndims, endof, length, isapprox,
@@ -9,7 +9,7 @@ import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==, g
 typealias QValue  Union{Number, AbstractArray, Uncertain} # things that go inside a Quantity
 # Quantity is where most of the action happens
 # Quantity combines a value with some units
-# Quantitys can be reduced to base units via asbase, which uses the UnitSytem Dict
+# Quantities can be reduced to base units via asbase, which uses the UnitSytem Dict
 # all other conversions are call on asbase
 type Quantity{T<:QValue}
     value::T

@@ -5,7 +5,7 @@ am = a*Meter
 b = rand()
 bu = b*Newton
 c=BigFloat(2)*Meter
-import Physical.Quantitys.PUnits.UnitSymbol
+import Physical.Quantities.PUnits.UnitSymbol
 
 @test isapprox((am^3.0*bu)/(Meter^3.0*Newton), a^3.0*b)
 @test isapprox((am^3.0*bu), a^3.0*b*(Meter^3.0*Newton))

@@ -25,7 +25,7 @@ Quantity(x::Quantity, y::Unit) = error("Quantity{Quantity} not allowed")
 # UnitSytem by example with SI units
 # UnitSystem["J"] = a quantity with other units that is equal to a Joule
 # UnitSystem["m"] = 0 which markes it as a non-prefixed base unit
-UnitSystem = Dict{UTF8String, Union{Quantity, Int}}() # I should figure out how to give DefaultUnitSystem a type
+UnitSystem = Dict{String, Union{Quantity, Int}}() # I should figure out how to give DefaultUnitSystem a type
 reset_unit_system() = [pop!(UnitSystem, k) for (k,v) in UnitSystem]
 function QUnit(x::AbstractString; prefix=0)
     return Quantity(1,Unit(x,prefix))
@@ -35,7 +35,7 @@ function BaseUnit(x::AbstractString; prefix=0, latex="", system=UnitSystem)
     return Quantity(1,Unit(x,prefix))
 end
 function DerivedUnit(x::AbstractString, y::Quantity; latex="", system=UnitSystem)
-    x=convert(UTF8String, x)
+    x=convert(String, x)
     system[x] = y
     return Quantity(1,Unit(x))
 end

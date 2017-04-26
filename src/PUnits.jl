@@ -2,19 +2,19 @@ module PUnits
 import Base: promote_rule, convert, show, sqrt, +, *, -, /, ^, .*, ./, .^, ==
 # UnitSymbol was added to support prefixes
 type UnitSymbol
-    sym::UTF8String # unit symbol, ie "m"
+    sym::String # unit symbol, ie "m"
     pre::Int16      # integer representing power of 10 of prefix, ie 3 represents kilo
 end
-UnitSymbol(sym::AbstractString, pre::Int) = UnitSymbol(convert(UTF8String, sym), Int16(pre))
+UnitSymbol(sym::AbstractString, pre::Int) = UnitSymbol(convert(String, sym), Int16(pre))
 Base.hash(x::UnitSymbol) = hash("$(x.sym),$(x.pre)") # make UnitSymbol act nice with Dict
 Base.isequal(x::UnitSymbol, y::UnitSymbol) = x.sym==y.sym && x.pre==y.pre
-PrefixSystem = Dict{Int16, UTF8String}()
+PrefixSystem = Dict{Int16, String}()
 reset_prefix_system() = [pop!(PrefixSystem, k) for (k,v) in PrefixSystem]
 type Prefix
     pre::Int16
 end
 function Prefix(sym::AbstractString, pre::Int)
-    PrefixSystem[Int16(pre)] = convert(UTF8String, sym)
+    PrefixSystem[Int16(pre)] = convert(String, sym)
     return Prefix(Int16(pre))
 end
 # Unit keeps track of unit symbols and powers, it has no idea how a symbol relates to

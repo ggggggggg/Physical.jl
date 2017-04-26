@@ -115,7 +115,7 @@ end
 .^{T}(x::Quantity{T}, y::Rational) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
 .^{T}(x::Quantity{T}, y::Integer) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
 .^{T}(x::Quantity{T}, y::Number) = Quantity_(x.value.^convert(AbstractFloat,y), x.unit.^convert(AbstractFloat,y))
-for f in (:(==), :<, :>, :>=, :<=, :.!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
+for f in (:(==), :<, :>, :>=, :<=, :!=, :(.==), :.<, :.>, :.>=, :.<=, :.!=, :isapprox)
     @eval begin function ($f)(x::Quantity, y::Quantity)
                     a = asbase(x)
                     b = asbase(y)

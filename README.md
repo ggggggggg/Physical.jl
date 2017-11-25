@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ggggggggg/Physical.jl.svg?branch=master)](https://travis-ci.org/ggggggggg/Physical.jl)
 
-Use `Unitful.jl` instead of this package. This won't be maintained.
+Use [Unitful.jl](https://github.com/ajkeller34/Unitful.jl) instead of this package. This won't be maintained.
 
 
 ```Physical``` provides simple support for arbitrary unit systems in Julia, as well a nice set of predefined units and constants. The keys are the types `Quantity` and `Unit`, but you should just use predefined unit constants for the most part. Since `Physical` is not yet an official package, install with `Pkg.clone("https://github.com/ggggggggg/Physical.jl.git")`.
